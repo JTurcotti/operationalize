@@ -176,15 +176,38 @@ let likelihood_characteristic (signal : meta -> bool) (p : program) =
 let pf_pd signal p =
   likelihood_characteristic signal p |> List.map (fun (_, pd, pf) -> (pf, pd))
 
+(* GRAPH UTIL *)
+
+let plot_scatter data =
+  let gp = Gnuplot.create () in
+
+  let output = Gnuplot.Output.create `Qt in
+
+  let labels = Gnuplot.Labels.create ~x:"False Alarm Probability" ~y:"Detection Probability" () in
+
+  let range = Gnuplot.Range.XY (0.0, 1.0, 0.0, 1.0) in
+
+  let dumb = Gnuplot.Series.linespoints_xy ~title:"ignorant classifier" ~color:`Black [(0., 0.); (1., 1.)] in
+  let p05 = Gnuplot.Series.linespoints_xy ~color:`Red [(0.05, 0.); (0.05, 1.)] in
+  let series = dumb :: p05 ::
+                 (data |> List.map (fun (title, data) ->
+                              Gnuplot.Series.linespoints_xy ~title:title data)) in
+  Gnuplot.plot_many ~output ~labels ~range gp series;
+  
+  ignore (read_line ());
+  Gnuplot.close gp
+
 (* EXAMPLES *)
 
-let threshold = 0.1
+let threshold = 0.4
 
 let lookup k m =
   match ResultMap.find_opt k m with
   | Some v -> v
   | None -> 0.
 
+(* this signal identifies meta universes in which the probability of X2 is significantly
+   greater (additive threshold) given X1 than given not X1 *)
 let reccomend_one_for_two_signal m : bool =
   let one_pos_results = domain_results [m] [Assign (true, 1); Measure 2] in
   let one_neg_results = domain_results [m] [Assign (false, 1); Measure 2] in
@@ -194,29 +217,17 @@ let reccomend_one_for_two_signal m : bool =
     (lookup [true] one_neg_results) /. (1. -. lookup [] one_neg_results) in
   prob_two_given_one > prob_two_given_none +. threshold
 
-let x = (pf_pd reccomend_one_for_two_signal [Assign (true, 1); Measure 2; Assign (true, 0); Measure 2])
-let x2 = (pf_pd reccomend_one_for_two_signal [Intervene (true, 1); Measure 2])
-
-let plot_scatter data =
-  let gp = Gnuplot.create () in
-
-  let output = Gnuplot.Output.create `Qt in
-
-  let labels = Gnuplot.Labels.create ~x:"P False Positive" ~y:"P Detection" () in
-
-  let range = Gnuplot.Range.XY (0.0, 1.0, 0.0, 1.0) in
-
-  let dumb = Gnuplot.Series.linespoints_xy ~title:"ignorant classifier" ~color:`Black [(0., 0.); (1., 1.)] in
-  let series = dumb :: (data |> List.map (fun (title, data) ->
-                            Gnuplot.Series.linespoints_xy ~title:title data)) in
-  Gnuplot.plot_many ~output ~labels ~range gp series;
-  
-  print_endline "Press Enter to close...";
-  ignore (read_line ());
-  Gnuplot.close gp
-
-let () = plot_scatter [("x", x); ("x2", x2)]
-
+let () = [
+    ("maximal", [Measure 0; Measure 1; Measure 2;
+                 Intervene (true, 0); Intervene (true, 1); Measure 2;
+                 Intervene (true, 1); Intervene (true, 0); Measure 2]);
+    ("observe 12", [Measure 1; Measure 2]);
+    ("intervene 0", [Intervene (true, 0); Measure 2]);
+    ("intervene 1", [Intervene (true, 1); Measure 2]);
+    ("intervene 01", [Intervene (true, 1); Intervene (true, 0); Measure 2])
+  ] |> List.map (fun (title, prog) -> (title, pf_pd reccomend_one_for_two_signal prog))
+         |> plot_scatter;
+    
 
 
 
