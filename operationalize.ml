@@ -226,8 +226,8 @@ let () = [
     ("intervene 1", [Intervene (true, 1); Measure 2]);
     ("intervene 01", [Intervene (true, 1); Intervene (true, 0); Measure 2])
   ] |> List.map (fun (title, prog) -> (title, pf_pd reccomend_one_for_two_signal prog))
-         |> plot_scatter;
-    
+         |> plot_scatter
 
-
-
+(* to run:
+   dune exec ./operationalize.exe
+ *)
