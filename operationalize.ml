@@ -1,4 +1,3 @@
-
 (* DEFINE THE CAUSAL STRUCTURE *)
 
 (* dimension of the observable data (X_i)'s *)
@@ -10,7 +9,8 @@ let graph : int list list = [
     [0; 1]
   ]
 
-let validate : unit =
+(* validation *)
+let () =
   if List.length graph != dimension then failwith "invalid dimension of graph";
   List.iteri (fun i incidence ->
       List.iter (fun j ->
@@ -151,7 +151,7 @@ let discriminate_domain (signal : meta -> bool) (p : program) =
   let neg_signal = Fun.compose not signal in
   let neg_domain = List.filter neg_signal all_metas in
   ResultMap.merge
-    (fun result pos_freq neg_freq -> match (pos_freq, neg_freq) with
+    (fun _ pos_freq neg_freq -> match (pos_freq, neg_freq) with
                                     | Some p, Some n -> Some (p /. n, p, n)
                                     | Some p, None -> Some (max_float, p, 0.)
                                     | None, Some n -> Some (0., 0., n)
@@ -173,6 +173,9 @@ let likelihood_characteristic (signal : meta -> bool) (p : program) =
                 (l_prev, pd_prev, pf_prev) :: tl)
          | _ -> failwith "empty init passed") [(max_float, 0., 0.)]
 
+let pf_pd signal p =
+  likelihood_characteristic signal p |> List.map (fun (_, pd, pf) -> (pf, pd))
+
 (* EXAMPLES *)
 
 let threshold = 0.1
@@ -191,11 +194,28 @@ let reccomend_one_for_two_signal m : bool =
     (lookup [true] one_neg_results) /. (1. -. lookup [] one_neg_results) in
   prob_two_given_one > prob_two_given_none +. threshold
 
-let x = (likelihood_characteristic reccomend_one_for_two_signal [Assign (true, 1); Measure 2; Assign (true, 0); Measure 2])
-let x2 = (likelihood_characteristic reccomend_one_for_two_signal [Intervene (true, 1); Measure 2])
+let x = (pf_pd reccomend_one_for_two_signal [Assign (true, 1); Measure 2; Assign (true, 0); Measure 2])
+let x2 = (pf_pd reccomend_one_for_two_signal [Intervene (true, 1); Measure 2])
 
+let plot_scatter data =
+  let gp = Gnuplot.create () in
 
+  let output = Gnuplot.Output.create `Qt in
 
+  let labels = Gnuplot.Labels.create ~x:"P False Positive" ~y:"P Detection" () in
+
+  let range = Gnuplot.Range.XY (0.0, 1.0, 0.0, 1.0) in
+
+  let dumb = Gnuplot.Series.linespoints_xy ~title:"ignorant classifier" ~color:`Black [(0., 0.); (1., 1.)] in
+  let series = dumb :: (data |> List.map (fun (title, data) ->
+                            Gnuplot.Series.linespoints_xy ~title:title data)) in
+  Gnuplot.plot_many ~output ~labels ~range gp series;
+  
+  print_endline "Press Enter to close...";
+  ignore (read_line ());
+  Gnuplot.close gp
+
+let () = plot_scatter [("x", x); ("x2", x2)]
 
 
 
