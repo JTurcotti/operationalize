@@ -206,6 +206,21 @@ let lookup k m =
   | Some v -> v
   | None -> 0.
 
+              (*
+                U_0
+                |
+                X_0 -> X_1
+                |   /
+                |  /
+                V V
+                X_2
+
+                is P_U[X_2 | X_1] - P_U[X_2 | NOT X_1] > threshold
+
+                X_2 = f_2(X_0, X_1, U_2) 
+
+               *)
+
 (* this signal identifies meta universes in which the probability of X2 is significantly
    greater (additive threshold) given X1 than given not X1 *)
 let reccomend_one_for_two_signal m : bool =
