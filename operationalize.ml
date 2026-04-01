@@ -233,13 +233,33 @@ let reccomend_one_for_two_signal m : bool =
   prob_two_given_one > prob_two_given_none +. threshold
 
 let () = [
+    ("maximaler", [Measure 0; Measure 1; Measure 2;
+                 Intervene (true, 0); Intervene (true, 1); Measure 2;
+                 Intervene (false, 0); Intervene (true, 1); Measure 2;
+                 Intervene (true, 0); Intervene (false, 1); Measure 2;
+                 Intervene (false, 0); Intervene (false, 1); Measure 2]
+    );
+
     ("maximal", [Measure 0; Measure 1; Measure 2;
                  Intervene (true, 0); Intervene (true, 1); Measure 2;
-                 Intervene (true, 1); Intervene (true, 0); Measure 2]);
+                 Intervene (false, 0); Intervene (true, 1); Measure 2]);
+    
     ("observe 12", [Measure 1; Measure 2]);
+    
     ("intervene 0", [Intervene (true, 0); Measure 2]);
+    
     ("intervene 1", [Intervene (true, 1); Measure 2]);
-    ("intervene 01", [Intervene (true, 1); Intervene (true, 0); Measure 2])
+    
+    ("intervene 01", [Intervene (true, 1); Intervene (true, 0); Measure 2]);
+
+    ("intervene 0 twice", [Intervene (true, 0); Measure 2; Intervene (false, 0); Measure 2]);
+    
+    ("intervene 1 twice", [Intervene (true, 1); Measure 2; Intervene (false, 1); Measure 2]);
+    
+    ("intervene 01 twice", [Intervene (true, 1); Intervene (true, 0); Measure 2;
+                            Intervene (false, 1); Intervene (false, 0); Measure 2])
+
+    
   ] |> List.map (fun (title, prog) -> (title, pf_pd reccomend_one_for_two_signal prog))
          |> plot_scatter
 
