@@ -1,0 +1,198 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb}
+\usepackage{braket}
+\usepackage{graphicx}
+
+\begin{document}
+
+\title{AIM Semantics for Causal Procedures}
+\author{Julia Turcotti}
+\maketitle
+
+\tableofcontents
+
+\section{Preliminaries}
+
+This document outlines a semantics for \textit{experimental procedures} operating against a statistical and causal model of variation amongst a population. The following subsections provide a mathematical overview of the modelling domain. Subsequent sections present a small grammar for experimental procedures (``AIM programs''), and provide semantics that demonstrate its expressive power for evaluating, verifying, and even synthesizing statistical estimators from their opeation.
+
+\subsection{Statistical modelling}
+
+Statistics concerns itself with answering questions about the observable characteristaics of units within a population. If we concern ourself with a finite number $N$ (the \textit{dimension}) of these characteristics, modelled as the \textit{random variable} $X = \{X_i \in \mathcal{X}\}_{i < N}$, then many interesting properties are immediately apparent given the \textit{joint distribution} $p_X(\cdot) \in \mathcal{P}^X$ of $X$. However, the dimension of the \textit{probability simplex} $\mathcal{P}^X$ in which this distribution lives is exponential in $N$, the dimension of the data, which makes modelling it directly intractability.
+
+
+Intuitively, this intractability arises because the composition of individual models $\{p_{X_i}(\cdot) \in \mathcal{P}^\mathcal{X}\}_i$, whose modelling complexity is linear in $N$, suffices to model the behavior of any particular characteristic, but fails to capture the dependencies among them.
+
+\textit{Structural causal models} address this inadequacy by separating the modelling of the dependencies among observable characteristics (which are common to all units) from the modelling of variation among units. In particular, variation across units is obtained by sampling from a \textit{universe} $\{U_i\}_{i < N} \in \mathcal{U}$ with dimensionality $N$ (as opposed to $2^{\Omega(N)}$). Since the $U_i$ are not directly observable, but rather are strictly internal components to the model, they are also referred to as the \textit{unobserved} terms.
+
+In general, if nothing further is known about the dependencies amongst the $X_i$, then the task of modelling $X$ from $\mathcal{U}$ is still $2^{\Omega(N)}$-intractable. However in practice, each $X_i$ can usually be reduced to dependency on its own corresponding $U_i$, and on a small (i.e. $o(N)$) number of other $X_i$, yielding $2^{o(N)}$ overall modelling complexity. In particular, there usually exists a parameter set $\Theta: |\Theta| = 2^{o(N)}$, each of whose terms specifies one possible form the limited dependencies amongst the $X_i$ can take. A given choice of $\theta \in \Theta$ fixes the observable behaviors of each universe relative to its unobserved terms, so is henceforth referred to as a \textit{meta-universe}.
+
+Formally, $X$, $U$, and $\theta$ are related via an \textit{observation operator} $\mathcal{O}_i : \mathcal{U} \times \Theta \to \mathcal{X}$, which computes the observable term $X_i$ for a fixed choice of universe and meta-universe. Together, the triple $\Gamma_s := (\mathcal{U}, \Theta, \mathcal{O})$ forms a fully general (statistical) model of $X$ (with feasible dimensionality!).
+
+\subsection{Causal modelling}
+
+Separating the modelling of $X$ into the modelling of a universe $U$ and a meta-universe $\theta$ is a major win not just in terms of modelling efficiency, but in terms of expressive power of the model. Indeed, the standard statistical operations of conditioning and measurement (which concern observations and inference of the universe $\mathcal{U}$) can be extended with \textit{causal} operations, such as \textit{intervention}, that have a common effect across all universes that can be directly modelled as observations and conditioning on the meta-universal parameter $\theta$.
+
+For example, small local changes to the dependency structure, such as intervention, which removes all extrinisic dependencies of $X_i$ and renders $X_i$ (across all universes) dependent only on the nature of the intervention, are easily modelled as (computationally inexpensive e.g. $O(1)$) changes $\mathcal{I}_i : \Theta \to \Theta$ - that determines the meta-universe obtained through intervention on the mechanisms determining $X_i$.
+
+The quadruple $\Gamma := (\mathcal{U}, \Theta, \mathcal{O}, \mathcal{I})$ now forms a feasibly-dimensional fully-general model of not just the universal variation amongst our population, but the \textit{meta-universal} variation amongst the many plausible underlying mechnanisms determining the nature of that variance. More concisely, $\Gamma$ extends $\Gamma_s$ to be not just a \textit{statistical} model, but a \textit{causal} model.
+
+Causal modelling allows for the expression of a strictly richer experimental semantics than statistical modelling, as will be expanded upon in the sequel.
+
+\section{AIM programs}
+
+Rarely do queries of interest about a model of a population take the form of simple, ``atomic'', probabilistic queries such as $\mathbb{P}[X_i = x] \sim p_{X_i}(x)$. In general, queries of interest often depend not just on more general dependencies amongst the observable data (like $\mathbb{P}[X_i + X_j > X_k | X_l > X_m]$), but on the semantics of \textit{causal} operations such as intervention (like $|\mathbb{P}[X_i | do(X_j) = x] - \mathbb{P}[X_i | X_j = x]| > \epsilon$ - which can answer the question ``can populations that are naturally observed to obey $X_j = x$ be distinguished from populations in which $X_j=x$ is artifically enforced by observing $X_i$?'', for example it is known statistically that higher performing grade school students eat breakfast, but can we further conclude (causally) that providing all students with breakfast will lead to uniformly higher performance?).
+
+\subsection{Grammar}
+
+To address experimental procedures that can interact with populations in statistical, casual, and mixed modes, the following grammar is presented:
+
+\newcommand{\X}{\mathcal{X}}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\I}{\mathbb{I}}
+\newcommand{\M}{\mathbb{M}}
+\newcommand{\T}{\mathcal{T}}
+\newcommand{\R}{\mathcal{R}}
+\newcommand{\D}{\mathcal{D}}
+
+\newcommand{\U}{\mathcal{U}}
+\newcommand{\MU}{\Theta}
+
+\renewcommand{\O}{\mathcal{O}}
+\newcommand{\Int}{\mathcal{I}}
+
+\begin{align*}
+\text{Term } \T &:= \A^{\mathcal{X}}_{i} \mid \I^{\mathcal{X}}_i \mid \M_i \\
+\text{Program } \R &:= \epsilon \mid \T ; \R \\
+\text{Result } \D &:= \epsilon \mid \X ; \D 
+\end{align*}
+
+$\T$ is an AIM term (whose semantics will shortly be explicated), $\R$, an AIM program, is a sequence of zero or more terms ($\R = \T^*$), and $\D$, an AIM result, is a sequence of zero or more values from the codomain $\X$ of our random variables $X_i$.
+
+\subsection{Operational Semantics}
+
+Recall $\Gamma := (\mathcal{U}, \Theta, \mathcal{O}, \mathcal{I})$ specifies a choice of universe, meta-universe, and operations for observation and intervention. Taking $\O$ and $\Int$ as fixed artifacts of the data representation, the following judgement form suffices to encode an \textit{evaluation semantics} (i.e. operational semantics) for AIM programs:
+
+
+\begin{equation*}
+  \U, \MU \vdash \R : \D
+\end{equation*}
+
+Interpreted as of ``in universe $\U$, in meta-universe $\MU$, AIM program $\R$ evaluates to result $\D$'', and is derived as follows:
+
+\begin{align*}
+  (\A^+\text{-eval}) &\quad \frac{\U, \MU \vdash \R : \D \quad \mathcal{O}_i(\U, \MU) = \X}{\U, \MU \vdash \A^{\X}_{i} ; \R : \D} \\[1.5em]
+  (\A^-\text{-eval}) &\quad \frac{\mathcal{O}_i(\U, \MU) \ne \X}{\U, \MU \vdash A^{\X}_{i} ; \R : \epsilon}
+\end{align*}
+
+These two rules define the semantics of the $\A$ ``assign'' term. Intuitively, a program containing a particular $\A$ term at point $\R_0; \A_i^\X; \R_1$ evaluates to the result of $\R_0; \R_1$ if $X_i = \X$ at that point, and to just the result of $\R_0$ otherwise. In this sense it is functionally equivalent to a conditional ``abort'' or ``assert''. In the context of a broader scientific trial, it is best interpreted as ``filtering'' the involved participants (or other units of study).
+\begin{align*}  
+  (\I\text{-eval}) &\quad \frac{\U, \Int_i^\X(\MU) \vdash \R : \D}{\U, \MU \vdash \I_i^\X; \R : \D} \\[1.5em]
+\end{align*}
+
+This rule defines the semantics of the $\I$ ``intervene'' term. Intuitively, a program $\R_0; \I_i^\X; \R_1$ returns a result in which the meta-universe in which the sequel $\R_1$ is evaluated differs from that in which $\R_0$ by an application of the intervention operator $\Int_i^\X: \MU \to \MU$ - which ``forces'' $X_i$ to take value $\X$ in the sequel.
+
+This highlights the expressive power of the separation of modelling concerns into a statistical universe $\U$ and a casual meta-universe $\MU$. It may be more intuitively obvious that an experiment can perform inference about a fixed meta-universal paramter $\theta$ by running repeated trials across differing universal draws $\U$ - e.g. by obtaining many distinct participants in the trials - but the semantics of the $\I$ term highlight that fixing $\U$, and varying $\MU$ - e.g. by performing measurements before and after structural interventions in the causal mechanisms under study - is equally expressible. Further, evaluation will show that the ability to separately vary both $\U$ and $\MU$ provides strict improvements in inferential power.
+
+\begin{align*}
+  (\M\text{-eval}) &\quad \frac{\U, \MU \vdash \R : \D}{\U, \MU \vdash \M_{idx}; \R : \O_i(\U, \MU); \D}
+\end{align*}
+
+Finally this rule defines of the $\M$ ``measure'' term. perhaps the most straightforward of the three AIM terms, $\R_0; \M_i; \R_1$ computes the value of $X_i$ post-evaluation of $\R_0$, and appends that value to the running stack of results.
+
+In particular, we can now note that the measurable result $\D$ of a program $\R$ that terminates naturally (i.e. can be evaluated without invoking the $\A^-$ ``abort'' rule) is a vector of values $\X$ equal in length to the number of $\M$ terms in the program. If evaluation instead invokes the abort rule at program point $\R = \R_0; \A; \R_1$, then the result $\D$ is a vector of values equal in length to the number of $\M$ terms in $\R_0$ (i.e. equal to the result of $\R_0$).
+
+\subsection{Functional Denotation}
+
+\newcommand{\F}{\mathbb{F}}
+
+The above semantics, inhabiting the judgement $\U, \MU \vdash \R : \D$, suffices to characterize the behavior of AIM programs as computationally explicit \textit{functions}:
+
+\begin{equation*}
+\F(\R) : (\U, \MU) \to \D
+\end{equation*}
+
+These functions can be evaluted ``forwards'' to translate known characteristics of $\U$ and $\MU$ (such as knowledge of (possibly probabilistic) properties of units (universes) or of the underlying causal mechanisms (meta-universes)) into characteristics of the result $\D$ of running $\R$. For example, that knowing a certain causal link is absent suffices to guarantee the independence of the results two experimental procuedures.
+
+However, the goals of statistical inference (of $\U$) or causal inference (of $\MU$) are more directly tied with the ``backwards'' semantics of these function $\F(\R)$. Namely, how can we improve on partial (or nil) information about $(\U, \MU)$ by observing $\F(\R)(\U, \MU)$? In particular, the nature of our split universal/meta-universal modelling means most learning objectives are well-described as trying to define \textit{estimators} or \textit{belief updates} for $\MU$ given a dataset composed of the result of $\R$ for many successive draws of $\U$.
+
+\subsection{Probabilistic Denotation}
+
+By introducing a ``prior'' on $\U$\footnote{this may seem to be a significant modelling obstacle, but in practice the maxim of ``max entropy priors'' suffices to provide a stable choice of $p_U$ near the ``center'' of the simplex $\mathcal{P}^{\U}$ that is near-optimal for most inferential procedures} we can now characterize our task as the modelling of the following markov chain:
+
+\begin{equation*}
+  \MU \to \D \to \hat{\MU}
+\end{equation*}
+
+Where $\mathbb{P}[\D \mid \MU]$ is given by $\Sigma_u \{p_U(u) \mid \F(\R)(u, \MU) = \D\}$, and appropriate definition of $\mathbb{P}[\MU \mid \D]$ (that, notably, cannot depend on $\U$ or $\MU$) characterises the concern of modelling the ``backwards'' direction of $\F(\R)$.
+
+In statistical terminology, $\hat{\MU}$ is referred to as an \textit{estimator}. Notable choices of $\hat{\MU}$ include the maximum liklihood (ML) estimator, the minimax estimator, and, for the particualar case of answering binary queries about $\MU$, the \textit{liklihood ratio tests} (expanded upon and implemented for a special case below). This setting also defines many meaingful performance criteria for estimators that aid search and verification, most notably, the \textit{channel capacity} (Shannon capacity) of the direct channel $\MU \to \D$, or even the capacity of induced channels like $\D_1 \to \D_2$ - i.e. trying to infer the result of one program by observing the result of another.
+
+
+Each of estimators and quantities above is called a ``non-bayesian'' because it does not rely on a prior for $\MU$\footnote{which, unlike $\U$, often does not lie within a euclidean domain like $\mathbb{R}^K$ that provdes meangingful max-entropy priors}. If, however, a prior on $\MU$ \textit{is} available, then further techniques (like Bayesian least squares, min log loss, etc) become available, and often reduce to tractable convex optimizations.
+
+\renewcommand{\P}{\mathcal{P}}
+
+The remainder of this report, sans a brief digression on a direct probabilistic denotation of AIM programs that does not depend on operationalizing their semantics, will be concerned with the specific case of implementing \textit{likelihood ratio tests}, but the reduction of a broad class of qualitiative modelling concerns to known procedures on the conditional distributions (referred to in statistics as the ``modelling family'') $\P = \{p_{\D ; \MU}(\cdot ; \theta)\}_{\theta \in \MU}$\footnote{or $\{p_{\D \mid \MU}(\cdot \mid \theta)\}_{\theta \in \MU}$ in the bayesian case} provides a much greater set of tools of relevance to the overarching AIM of experimental analysis
+
+\subsubsection{Direct Denotational Semantics}
+
+To obtain a characterization of $\P$ from the functional denotations $\F(\R)$ requires a multiply exponential enumeration\footnote{though probabilistic approximations such as Monte Carlo sampling, and indeed any of the many techniques used for the generalization fo this task to inference for modern \textit{probabilistic programs}, are all of import} that is only computationally tractable for ``toy'' domains. Since its correctness depends on nothing but acceptance of the judgement rules $\U, \MU \vdash \R : \D$ and basic probabilistic identities, it is still useful as \textit{reference implementation}, but must be shown to correspond to a more efficient implementation to be of practical use.
+
+Without delving too far into this concern, we note that AIM programs can alternatively be given a direct probabilistic denotation in the ``do''-augmented probability calculus of the following form:
+
+\begin{equation*}
+  \forall \D, \mathbb{P}[\R : \D] \sim \mathbb{P}[\braket{f(X_i)|[f(X_i)]} \mid [\braket{f(X_i)|[f(X_i)]}]]
+\end{equation*}
+
+Where braket notation expresses the ``do'' operator and several other grammatical constructs are used without explanation. Further work will thisupon expound.
+
+\section{Binary Hypothesis Testing}
+
+Of particular concern is the following scenario:
+
+\newcommand{\Rtest}{\R_{\text{test}}}
+\newcommand{\Rtrain}{\R_{\text{train}}}
+\newcommand{\Dtest}{\D_{\text{test}}}
+\newcommand{\Dtrain}{\D_{\text{train}}}
+
+
+Given two AIM programs, $\Rtest, \Rtrain$, derive a procedure for estimating the results of $\Rtest$ given access to the results of $\Rtrain$. Further, assume that $$\Dtest \equiv \mathbb{B} \equiv\{0, 1\} \equiv \{H_1, H_0\}$$ i.e., $\Rtest$ is a ``binary hypothesis test'' - whose values can be characterized by a single bit, and whose outcomes are often referred to as $H_1$ (effect) and $H_0$ (null hypothesis).
+
+\subsection{Liklihood Ratio Tests}
+
+Now, even without a prior on $\MU$, we can define the \textit{likelihood ratio}:
+
+\renewcommand{\L}{\mathcal{L}}
+
+\begin{equation*}
+  \forall d \in \Dtrain: \L(d) := \frac{\mathbb{P}[\F(\Rtrain) = d \mid \F(\Rtest) = H_1]}{\mathbb{P}[\F(\Rtrain) = d \mid \F(\Rtest) = H_0]}
+\end{equation*}
+
+some of the details of computing this test across the whole domain $\Dtrain$ (which is not constrained to be binary - and in fact benefits greatly (as will be seen below) from increased multiplicty) are elided for now.
+
+Intuitively, we can effectively discriminate amongst the hypotheses $\Rtest \sim \{H_1, H_0\}$ by running $\Rtrain$ to obtain a result $d$ and computing its liklihood ratio $0 \le \L(d) \le \infty$. To utilize this derived variable, we note that larger values of $\L(d)$ correspond to increased confidence in $H_1$ and smaller values to increased confidence in $H_0$. This means\footnote{a result classical called the ``Neyman–Pearson lemma''} that no test that predicts $H_1$ for a value of $\L$ less than a value for which it predicts $H_0$ can be optimal (switching the two predictions would provide uniform improvement), so optimal tests always take the form of a \textit{liklihood ratio test}:
+
+\begin{align*}
+  d \mapsto \L(d) \ge \eta &\implies H_1 \\
+  d \mapsto \L(d) < \eta &\implies H_0
+\end{align*}
+
+\subsection{Neyman-Pearson Frontiers}
+
+Where $\eta \ge 0$ is called the \textit{threshold} of the test. In the bayesian setting, there exist derivations of optimal choice of $\eta$ for any well-behaved cost criterion (alt. loss function). In general, choice of $\eta$ yields a tradeoff betwen the following two quantities:
+
+\begin{align*}
+  P_f = \mathbb{P}[\hat{H_1} \mid H_0] \\
+  P_d = \mathbb{P}[\hat{H_1} \mid H_1]
+\end{align*}
+
+$P_f$, the ``false alarm probability'', is the chance of determing the effect is present when it is not.
+$P_d$, the ``detection probability'', is the chance of determining the effect is present when it is.
+
+Increasing $\eta$ decreases the sensitivity of the test, which lowers both $P_f$ and $P_d$. This yields the following graphical illustration of the tradeoff:
+
+\includegraphics[width=0.75\linewidth]{example_operational_characteristic.png}
+
+This shows the $(P_f, P_d)$ characteristic for varying $\eta$ for various experiments. Further details to be expounded upon soon.
+
+ \end{document}
