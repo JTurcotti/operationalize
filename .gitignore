@@ -2,3 +2,8 @@
 *.cmi
 *.cmo
 _build
+*.aux
+*.log
+*.synctex.gz
+*.toc
+*.DS_store
