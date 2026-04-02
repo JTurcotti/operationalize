@@ -5,7 +5,14 @@
 
 \begin{document}
 
-\title{AIM Semantics for Causal Procedures}
+\newcommand{\A}{\mathbb{A}}
+\newcommand{\I}{\mathbb{I}}
+\newcommand{\M}{\mathbb{M}}
+
+\newcommand{\AIM}{\ensuremath{\A\I\M}~}
+
+
+\title{\AIM Semantics for Causal Procedures}
 \author{Julia Turcotti}
 \maketitle
 
@@ -13,7 +20,7 @@
 
 \section{Preliminaries}
 
-This document outlines a semantics for \textit{experimental procedures} operating against a statistical and causal model of variation amongst a population. The following subsections provide a mathematical overview of the modelling domain. Subsequent sections present a small grammar for experimental procedures (``AIM programs''), and provide semantics that demonstrate its expressive power for evaluating, verifying, and even synthesizing statistical estimators from their opeation.
+This document outlines a semantics for \textit{experimental procedures} operating against a statistical and causal model of variation amongst a population. The following subsections provide a mathematical overview of the modelling domain. Subsequent sections present a small grammar for experimental procedures (``\AIM programs''), and provide semantics that demonstrate its expressive power for evaluating, verifying, and even synthesizing statistical estimators from their opeation.
 
 \subsection{Statistical modelling}
 
@@ -38,18 +45,16 @@ The quadruple $\Gamma := (\mathcal{U}, \Theta, \mathcal{O}, \mathcal{I})$ now fo
 
 Causal modelling allows for the expression of a strictly richer experimental semantics than statistical modelling, as will be expanded upon in the sequel.
 
-\section{AIM programs}
+\section{\AIM programs}
 
-Rarely do queries of interest about a model of a population take the form of simple, ``atomic'', probabilistic queries such as $\mathbb{P}[X_i = x] \sim p_{X_i}(x)$. In general, queries of interest often depend not just on more general dependencies amongst the observable data (like $\mathbb{P}[X_i + X_j > X_k | X_l > X_m]$), but on the semantics of \textit{causal} operations such as intervention (like $|\mathbb{P}[X_i | do(X_j) = x] - \mathbb{P}[X_i | X_j = x]| > \epsilon$ - which can answer the question ``can populations that are naturally observed to obey $X_j = x$ be distinguished from populations in which $X_j=x$ is artifically enforced by observing $X_i$?'', for example it is known statistically that higher performing grade school students eat breakfast, but can we further conclude (causally) that providing all students with breakfast will lead to uniformly higher performance?).
+Rarely do queries of interest about a model of a population take the form of simple, ``atomic'', probabilistic queries such as $\mathbb{P}[X_i = x] \sim p_{X_i}(x)$. In general, queries of interest often depend not just on more general dependencies amongst the observable data\footnote{though many interesting statistical properties do take this form, e.g. $\mathbb{P}[X_i + X_j > X_k | X_l > X_m]$}, but on the semantics of \textit{causal} operations such as intervention\footnote{consider $|\mathbb{P}[X_i | do(X_j) = x] - \mathbb{P}[X_i | X_j = x]| > \epsilon]$ - a query which can answer the question ``can populations that are naturally observed to obey $X_j = x$ be distinguished from populations in which $X_j=x$ is artifically enforced by observing $X_i$?'', for example it is known statistically that higher performing grade school students eat breakfast, but can we further conclude (causally) that providing all students with breakfast will lead to uniformly higher performance?).}
 
 \subsection{Grammar}
 
 To address experimental procedures that can interact with populations in statistical, casual, and mixed modes, the following grammar is presented:
 
 \newcommand{\X}{\mathcal{X}}
-\newcommand{\A}{\mathbb{A}}
-\newcommand{\I}{\mathbb{I}}
-\newcommand{\M}{\mathbb{M}}
+
 \newcommand{\T}{\mathcal{T}}
 \newcommand{\R}{\mathcal{R}}
 \newcommand{\D}{\mathcal{D}}
@@ -66,22 +71,30 @@ To address experimental procedures that can interact with populations in statist
 \text{Result } \D &:= \epsilon \mid \X ; \D 
 \end{align*}
 
-$\T$ is an AIM term (whose semantics will shortly be explicated), $\R$, an AIM program, is a sequence of zero or more terms ($\R = \T^*$), and $\D$, an AIM result, is a sequence of zero or more values from the codomain $\X$ of our random variables $X_i$.
+$\T$ is an \AIM term (whose semantics will shortly be explicated)\footnote{in its current form, $\A\I\M$ programs can be reduced to equivalent $\I\M$ expressions with output post-processing (i.e. the $\A$ operator is redundant), but but the current $\A$ construct can be naturally extended to a non-redundant branching construct in future forms}, $\R$, an \AIM program, is a sequence of zero or more terms ($\R = \T^*$), and $\D$, an \AIM result, is a sequence of zero or more values from the codomain $\X$ of our random variables $X_i$.
+
+To briefly motivate this term language, we provide the following interpretations of the three operators:
+
+\begin{align*}
+  \A_i^x &: \text{assign -- only proceed with execution if } X_i = x\\
+  \I_i^x &: \text{intervene -- use causal intervention to enforce } X_i = x \text{ for the remainder of execution}\\
+  \M_i &: \text{measure -- include the present value of } X_i \text{ in the output}\\
+\end{align*}
 
 \subsection{Operational Semantics}
 
-Recall $\Gamma := (\mathcal{U}, \Theta, \mathcal{O}, \mathcal{I})$ specifies a choice of universe, meta-universe, and operations for observation and intervention. Taking $\O$ and $\Int$ as fixed artifacts of the data representation, the following judgement form suffices to encode an \textit{evaluation semantics} (i.e. operational semantics) for AIM programs:
+Recall $\Gamma := (\mathcal{U}, \Theta, \mathcal{O}, \mathcal{I})$ specifies a choice of universe, meta-universe, and operations for observation and intervention. Taking $\O$ and $\Int$ as fixed artifacts of the data representation, the following judgement form suffices to encode an \textit{evaluation semantics} (i.e. operational semantics) for \AIM programs:
 
 
 \begin{equation*}
   \U, \MU \vdash \R : \D
 \end{equation*}
 
-Interpreted as of ``in universe $\U$, in meta-universe $\MU$, AIM program $\R$ evaluates to result $\D$'', and is derived as follows:
+Interpreted as of ``in universe $\U$, in meta-universe $\MU$, \AIM program $\R$ evaluates to result $\D$'', and is derived as follows:
 
 \begin{align*}
   (\A^+\text{-eval}) &\quad \frac{\U, \MU \vdash \R : \D \quad \mathcal{O}_i(\U, \MU) = \X}{\U, \MU \vdash \A^{\X}_{i} ; \R : \D} \\[1.5em]
-  (\A^-\text{-eval}) &\quad \frac{\mathcal{O}_i(\U, \MU) \ne \X}{\U, \MU \vdash A^{\X}_{i} ; \R : \epsilon}
+  (\A^-\text{-eval}) &\quad \frac{\mathcal{O}_i(\U, \MU) \ne \X}{\U, \MU \vdash \A^{\X}_{i} ; \R : \epsilon}
 \end{align*}
 
 These two rules define the semantics of the $\A$ ``assign'' term. Intuitively, a program containing a particular $\A$ term at point $\R_0; \A_i^\X; \R_1$ evaluates to the result of $\R_0; \R_1$ if $X_i = \X$ at that point, and to just the result of $\R_0$ otherwise. In this sense it is functionally equivalent to a conditional ``abort'' or ``assert''. In the context of a broader scientific trial, it is best interpreted as ``filtering'' the involved participants (or other units of study).
@@ -94,10 +107,10 @@ This rule defines the semantics of the $\I$ ``intervene'' term. Intuitively, a p
 This highlights the expressive power of the separation of modelling concerns into a statistical universe $\U$ and a casual meta-universe $\MU$. It may be more intuitively obvious that an experiment can perform inference about a fixed meta-universal paramter $\theta$ by running repeated trials across differing universal draws $\U$ - e.g. by obtaining many distinct participants in the trials - but the semantics of the $\I$ term highlight that fixing $\U$, and varying $\MU$ - e.g. by performing measurements before and after structural interventions in the causal mechanisms under study - is equally expressible. Further, evaluation will show that the ability to separately vary both $\U$ and $\MU$ provides strict improvements in inferential power.
 
 \begin{align*}
-  (\M\text{-eval}) &\quad \frac{\U, \MU \vdash \R : \D}{\U, \MU \vdash \M_{idx}; \R : \O_i(\U, \MU); \D}
+  (\M\text{-eval}) &\quad \frac{\U, \MU \vdash \R : \D}{\U, \MU \vdash \M_{i}; \R : \O_i(\U, \MU); \D}
 \end{align*}
 
-Finally this rule defines of the $\M$ ``measure'' term. perhaps the most straightforward of the three AIM terms, $\R_0; \M_i; \R_1$ computes the value of $X_i$ post-evaluation of $\R_0$, and appends that value to the running stack of results.
+Finally this rule defines of the $\M$ ``measure'' term. perhaps the most straightforward of the three \AIM terms, $\R_0; \M_i; \R_1$ computes the value of $X_i$ post-evaluation of $\R_0$, and appends that value to the running stack of results.
 
 In particular, we can now note that the measurable result $\D$ of a program $\R$ that terminates naturally (i.e. can be evaluated without invoking the $\A^-$ ``abort'' rule) is a vector of values $\X$ equal in length to the number of $\M$ terms in the program. If evaluation instead invokes the abort rule at program point $\R = \R_0; \A; \R_1$, then the result $\D$ is a vector of values equal in length to the number of $\M$ terms in $\R_0$ (i.e. equal to the result of $\R_0$).
 
@@ -105,7 +118,7 @@ In particular, we can now note that the measurable result $\D$ of a program $\R$
 
 \newcommand{\F}{\mathbb{F}}
 
-The above semantics, inhabiting the judgement $\U, \MU \vdash \R : \D$, suffices to characterize the behavior of AIM programs as computationally explicit \textit{functions}:
+The above semantics, inhabiting the judgement $\U, \MU \vdash \R : \D$, suffices to characterize the behavior of \AIM programs as computationally explicit \textit{functions}:
 
 \begin{equation*}
 \F(\R) : (\U, \MU) \to \D
@@ -132,13 +145,13 @@ Each of estimators and quantities above is called a ``non-bayesian'' because it 
 
 \renewcommand{\P}{\mathcal{P}}
 
-The remainder of this report, sans a brief digression on a direct probabilistic denotation of AIM programs that does not depend on operationalizing their semantics, will be concerned with the specific case of implementing \textit{likelihood ratio tests}, but the reduction of a broad class of qualitiative modelling concerns to known procedures on the conditional distributions (referred to in statistics as the ``modelling family'') $\P = \{p_{\D ; \MU}(\cdot ; \theta)\}_{\theta \in \MU}$\footnote{or $\{p_{\D \mid \MU}(\cdot \mid \theta)\}_{\theta \in \MU}$ in the bayesian case} provides a much greater set of tools of relevance to the overarching AIM of experimental analysis
+The remainder of this report, sans a brief digression on a direct probabilistic denotation of \AIM programs that does not depend on operationalizing their semantics, will be concerned with the specific case of implementing \textit{likelihood ratio tests}, but the reduction of a broad class of qualitiative modelling concerns to known procedures on the conditional distributions (referred to in statistics as the ``modelling family'') $\P = \{p_{\D ; \MU}(\cdot ; \theta)\}_{\theta \in \MU}$\footnote{or $\{p_{\D \mid \MU}(\cdot \mid \theta)\}_{\theta \in \MU}$ in the bayesian case} provides a much greater set of tools of relevance to the overarching \AIM of experimental analysis
 
 \subsubsection{Direct Denotational Semantics}
 
 To obtain a characterization of $\P$ from the functional denotations $\F(\R)$ requires a multiply exponential enumeration\footnote{though probabilistic approximations such as Monte Carlo sampling, and indeed any of the many techniques used for the generalization fo this task to inference for modern \textit{probabilistic programs}, are all of import} that is only computationally tractable for ``toy'' domains. Since its correctness depends on nothing but acceptance of the judgement rules $\U, \MU \vdash \R : \D$ and basic probabilistic identities, it is still useful as \textit{reference implementation}, but must be shown to correspond to a more efficient implementation to be of practical use.
 
-Without delving too far into this concern, we note that AIM programs can alternatively be given a direct probabilistic denotation in the ``do''-augmented probability calculus of the following form:
+Without delving too far into this concern, we note that \AIM programs can alternatively be given a direct probabilistic denotation in the ``do''-augmented probability calculus of the following form:
 
 \begin{equation*}
   \forall \D, \mathbb{P}[\R : \D] \sim \mathbb{P}[\braket{f(X_i)|[f(X_i)]} \mid [\braket{f(X_i)|[f(X_i)]}]]
@@ -156,7 +169,7 @@ Of particular concern is the following scenario:
 \newcommand{\Dtrain}{\D_{\text{train}}}
 
 
-Given two AIM programs, $\Rtest, \Rtrain$, derive a procedure for estimating the results of $\Rtest$ given access to the results of $\Rtrain$. Further, assume that $$\Dtest \equiv \mathbb{B} \equiv\{0, 1\} \equiv \{H_1, H_0\}$$ i.e., $\Rtest$ is a ``binary hypothesis test'' - whose values can be characterized by a single bit, and whose outcomes are often referred to as $H_1$ (effect) and $H_0$ (null hypothesis).
+Given two \AIM programs, $\Rtest, \Rtrain$, derive a procedure for estimating the results of $\Rtest$ given access to the results of $\Rtrain$. Further, assume that $$\Dtest \equiv \mathbb{B} \equiv\{0, 1\} \equiv \{H_1, H_0\}$$ i.e., $\Rtest$ is a ``binary hypothesis test'' - whose values can be characterized by a single bit, and whose outcomes are often referred to as $H_1$ (effect) and $H_0$ (null hypothesis).
 
 \subsection{Liklihood Ratio Tests}
 
