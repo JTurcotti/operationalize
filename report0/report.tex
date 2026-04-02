@@ -179,6 +179,8 @@ Intuitively, we can effectively discriminate amongst the hypotheses $\Rtest \sim
 
 \subsection{Neyman-Pearson Frontiers}
 
+\footnote{Also called ROC (receiver operating characteristic) curves}
+
 Where $\eta \ge 0$ is called the \textit{threshold} of the test. In the bayesian setting, there exist derivations of optimal choice of $\eta$ for any well-behaved cost criterion (alt. loss function). In general, choice of $\eta$ yields a tradeoff betwen the following two quantities:
 
 \begin{align*}
@@ -191,8 +193,15 @@ $P_d$, the ``detection probability'', is the chance of determining the effect is
 
 Increasing $\eta$ decreases the sensitivity of the test, which lowers both $P_f$ and $P_d$. This yields the following graphical illustration of the tradeoff:
 
-\includegraphics[width=0.75\linewidth]{example_operational_characteristic.png}
+\includegraphics[width=0.85\linewidth]{example_operational_characteristic.png}
 
 This shows the $(P_f, P_d)$ characteristic for varying $\eta$ for various experiments. Further details to be expounded upon soon.
+
+
+\includegraphics[width=0.85\linewidth]{bigger_pic.png}
+
+This shows the frontiers for a wider range of programs, whose definitions in our ocaml version of this math is also provided below (for loose reference):
+
+\includegraphics[width=0.85\linewidth]{code.png}
 
  \end{document}

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.22)  1 APR 2026 11:29
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.3.22)  2 APR 2026 09:37
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -201,19 +201,31 @@ Overfull \hbox (3.56493pt too wide) in paragraph at lines 16--17
 File: example_operational_characteristic.png Graphic file (type png)
 <use example_operational_characteristic.png>
 Package pdftex.def Info: example_operational_characteristic.png  used on input 
-line 194.
-(pdftex.def)             Requested size: 258.75pt x 194.06929pt.
- [7] [8 <./example_operational_characteristic.png (PNG copy)>] (./report.aux)
+line 196.
+(pdftex.def)             Requested size: 293.2521pt x 219.9398pt.
+ [7]
+<bigger_pic.png, id=46, 986.68625pt x 731.73375pt>
+File: bigger_pic.png Graphic file (type png)
+<use bigger_pic.png>
+Package pdftex.def Info: bigger_pic.png  used on input line 201.
+(pdftex.def)             Requested size: 293.2521pt x 217.47856pt.
+<code.png, id=47, 744.7825pt x 483.8075pt>
+File: code.png Graphic file (type png)
+<use code.png>
+Package pdftex.def Info: code.png  used on input line 205.
+(pdftex.def)             Requested size: 293.2521pt x 190.50021pt.
+ [8 <./example_operational_characteristic.png (PNG copy)> <./bigger_pic.png (PN
+G copy)>] [9 <./code.png>] (./report.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 2611 strings out of 467525
- 37595 string characters out of 5418982
+ 2625 strings out of 467525
+ 37845 string characters out of 5418982
  445756 words of memory out of 5000000
- 31512 multiletter control sequences out of 15000+600000
+ 31526 multiletter control sequences out of 15000+600000
  636282 words of font info for 73 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  57i,10n,65p,928b,222s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -237,10 +249,10 @@ f-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2026/texmf-
 dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2026/texmf-d
 ist/fonts/type1/public/amsfonts/cm/cmti8.pfb></usr/local/texlive/2026/texmf-dis
 t/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on report.pdf (8 pages, 300258 bytes).
+Output written on report.pdf (9 pages, 526460 bytes).
 PDF statistics:
- 132 PDF objects out of 1000 (max. 8388607)
- 80 compressed objects within 1 object stream
+ 139 PDF objects out of 1000 (max. 8388607)
+ 83 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 16 words of extra memory for PDF output out of 10000 (max. 10000000)
 
