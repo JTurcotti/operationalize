@@ -24,7 +24,7 @@ This document outlines a semantics for \textit{experimental procedures} operatin
 
 \subsection{Statistical modelling}
 
-Statistics concerns itself with answering questions about the observable characteristaics of units within a population. If we concern ourself with a finite number $N$ (the \textit{dimension}) of these characteristics, modelled as the \textit{random variable} $X = \{X_i \in \mathcal{X}\}_{i < N}$, then many interesting properties are immediately apparent given the \textit{joint distribution} $p_X(\cdot) \in \mathcal{P}^X$ of $X$. However, the dimension of the \textit{probability simplex} $\mathcal{P}^X$ in which this distribution lives is exponential in $N$, the dimension of the data, which makes modelling it directly intractability.
+Statistics concerns itself with answering questions about the observable characteristaics of units within a population. If we concern ourself with a finite number $N$ (the \textit{dimension}) of these characteristics, modelled as the \textit{random variable} $X = \{X_i \in \mathcal{X}\}_{i < N}$, then many interesting properties are immediately apparent given the \textit{joint distribution} $p_X(\cdot) \in \mathcal{P}^X$ of $X$. However, the dimension of the \textit{probability simplex} $\mathcal{P}^X$ in which this distribution lives is exponential in $N$, the dimension of the data, which makes modelling it directly intractable.
 
 
 Intuitively, this intractability arises because the composition of individual models $\{p_{X_i}(\cdot) \in \mathcal{P}^\mathcal{X}\}_i$, whose modelling complexity is linear in $N$, suffices to model the behavior of any particular characteristic, but fails to capture the dependencies among them.
@@ -136,7 +136,7 @@ By introducing a ``prior'' on $\U$\footnote{this may seem to be a significant mo
   \MU \to \D \to \hat{\MU}
 \end{equation*}
 
-Where $\mathbb{P}[\D \mid \MU]$ is given by $\Sigma_u \{p_U(u) \mid \F(\R)(u, \MU) = \D\}$, and appropriate definition of $\mathbb{P}[\MU \mid \D]$ (that, notably, cannot depend on $\U$ or $\MU$) characterises the concern of modelling the ``backwards'' direction of $\F(\R)$.
+Where $\mathbb{P}[\D \mid \MU]$ is given by $\Sigma_u \{p_U(u) \mid \F(\R)(u, \MU) = \D\}$, and appropriate definition of $\mathbb{P}[\hat{\MU} \mid \D]$ (that, notably, cannot depend on $\U$ or $\MU$) characterises the concern of modelling the ``backwards'' direction of $\F(\R)$.
 
 In statistical terminology, $\hat{\MU}$ is referred to as an \textit{estimator}. Notable choices of $\hat{\MU}$ include the maximum liklihood (ML) estimator, the minimax estimator, and, for the particualar case of answering binary queries about $\MU$, the \textit{liklihood ratio tests} (expanded upon and implemented for a special case below). This setting also defines many meaingful performance criteria for estimators that aid search and verification, most notably, the \textit{channel capacity} (Shannon capacity) of the direct channel $\MU \to \D$, or even the capacity of induced channels like $\D_1 \to \D_2$ - i.e. trying to infer the result of one program by observing the result of another.
 
@@ -147,7 +147,7 @@ Each of estimators and quantities above is called a ``non-bayesian'' because it 
 
 The remainder of this report, sans a brief digression on a direct probabilistic denotation of \AIM programs that does not depend on operationalizing their semantics, will be concerned with the specific case of implementing \textit{likelihood ratio tests}, but the reduction of a broad class of qualitiative modelling concerns to known procedures on the conditional distributions (referred to in statistics as the ``modelling family'') $\P = \{p_{\D ; \MU}(\cdot ; \theta)\}_{\theta \in \MU}$\footnote{or $\{p_{\D \mid \MU}(\cdot \mid \theta)\}_{\theta \in \MU}$ in the bayesian case} provides a much greater set of tools of relevance to the overarching \AIM of experimental analysis
 
-\subsubsection{Direct Denotational Semantics}
+\subsubsection{Direct Probabilistic Denotations}
 
 To obtain a characterization of $\P$ from the functional denotations $\F(\R)$ requires a multiply exponential enumeration\footnote{though probabilistic approximations such as Monte Carlo sampling, and indeed any of the many techniques used for the generalization fo this task to inference for modern \textit{probabilistic programs}, are all of import} that is only computationally tractable for ``toy'' domains. Since its correctness depends on nothing but acceptance of the judgement rules $\U, \MU \vdash \R : \D$ and basic probabilistic identities, it is still useful as \textit{reference implementation}, but must be shown to correspond to a more efficient implementation to be of practical use.
 
@@ -190,11 +190,13 @@ Intuitively, we can effectively discriminate amongst the hypotheses $\Rtest \sim
   d \mapsto \L(d) < \eta &\implies H_0
 \end{align*}
 
+Where $\eta \ge 0$ is called the \textit{threshold} of the test. 
+
 \subsection{Neyman-Pearson Frontiers}
 
 \footnote{Also called ROC (receiver operating characteristic) curves}
 
-Where $\eta \ge 0$ is called the \textit{threshold} of the test. In the bayesian setting, there exist derivations of optimal choice of $\eta$ for any well-behaved cost criterion (alt. loss function). In general, choice of $\eta$ yields a tradeoff betwen the following two quantities:
+In the bayesian setting, there exist derivations of optimal choice of $\eta$ for any well-behaved cost criterion (alt. loss function). In general, choice of $\eta$ yields a tradeoff betwen the following two quantities:
 
 \begin{align*}
   P_f = \mathbb{P}[\hat{H_1} \mid H_0] \\
