@@ -5,11 +5,10 @@
 
 \begin{document}
 
-\newcommand{\A}{\mathbb{A}}
-\newcommand{\I}{\mathbb{I}}
-\newcommand{\M}{\mathbb{M}}
-
-\newcommand{\AIM}{\ensuremath{\A\I\M}~}
+\newcommand{\A}{\ensuremath{\mathbb{A}}}
+\newcommand{\I}{\ensuremath{\mathbb{I}}}
+\newcommand{\M}{\ensuremath{\mathbb{M}}}
+\newcommand{\AIM}{\A\I\M~}
 
 
 \title{\AIM Semantics for Causal Procedures}
@@ -24,7 +23,13 @@ This document outlines a semantics for \textit{experimental procedures} operatin
 
 \subsection{Statistical modelling}
 
-Statistics concerns itself with answering questions about the observable characteristaics of units within a population. If we concern ourself with a finite number $N$ (the \textit{dimension}) of these characteristics, modelled as the \textit{random variable} $$X = \{X_i \in \mathcal{X}\}_{i < N}$$ then many interesting properties are immediately apparent given the \textit{joint distribution} $p_X(\cdot) \in \mathcal{P}^X$ of $X$. However, the dimension of the \textit{probability simplex} $\mathcal{P}^X$ in which this distribution lives is exponential in $N$, the dimension of the data, which makes modelling it directly intractable.
+Statistics concerns itself with answering questions about the observable characteristaics of units within a population. If we concern ourself with a finite number $N$ (the \textit{dimension}) of these characteristics, modelled as the \textit{random variable}
+
+\begin{equation*}
+X = \{X_i \in \mathcal{X}\}_{i < N}
+\end{equation*}
+
+then many interesting properties are immediately apparent given the \textit{joint distribution} $p_X(\cdot) \in \mathcal{P}^X$ of $X$. However, the dimension of the \textit{probability simplex} $\mathcal{P}^X$ in which this distribution lives is exponential in $N$, the dimension of the data, which makes modelling it directly intractable.
 
 
 Intuitively, this intractability arises because the composition of individual models $\{p_{X_i}(\cdot) \in \mathcal{P}^\mathcal{X}\}_i$, whose modelling complexity is linear in $N$, suffices to model the behavior of any particular characteristic, but fails to capture the dependencies among them.
@@ -87,29 +92,39 @@ To briefly motivate this term language, we provide the following interpretations
 
 Recall $\Gamma := (\mathcal{U}, \Theta, \mathcal{O}, \mathcal{I})$ specifies a choice of universe, meta-universe, and operations for observation and intervention. Taking $\O$ and $\Int$ as fixed artifacts of the data representation, the following judgement form suffices to encode an \textit{evaluation semantics} (i.e. operational semantics) for \AIM programs:
 
+\newcommand{\dto}{\downarrow}
 
 \begin{equation*}
-  \U, \MU \vdash \R : \D
+  \U, \MU \vdash \R \dto \D
 \end{equation*}
 
 Interpreted as of ``in universe $\U$, in meta-universe $\MU$, \AIM program $\R$ evaluates to result $\D$'', and is derived as follows:
 
+\subsubsection{\A ssign Rule}
+
 \begin{align*}
-  (\A^+\text{-eval}) &\quad \frac{\U, \MU \vdash \R : \D \quad \mathcal{O}_i(\U, \MU) = x}{\U, \MU \vdash \A^{x}_{i} ; \R : \D} \\[1.5em]
-  (\A^-\text{-eval}) &\quad \frac{\mathcal{O}_i(\U, \MU) \ne x}{\U, \MU \vdash \A^{x}_{i} ; \R : \epsilon}
+  (\A^+\text{-eval}) &\quad \frac{\U, \MU \vdash \R \dto \D \quad \mathcal{O}_i(\U, \MU) = x}{\U, \MU \vdash \A^{x}_{i} ; \R \dto \D} \\[1.5em]
+  (\A^-\text{-eval}) &\quad \frac{\mathcal{O}_i(\U, \MU) \ne x}{\U, \MU \vdash \A^{x}_{i} ; \R \dto \epsilon}
 \end{align*}
 
 These two rules define the semantics of the $\A$ ``assign'' term. Intuitively, a program containing a particular $\A$ term at point $\R_0; \A_i^x; \R_1$ evaluates to the result of $\R_0; \R_1$ if $X_i = x$ at that point, and to just the result of $\R_0$ otherwise. In this sense it is functionally equivalent to a conditional ``abort'' or ``assert''. In the context of a broader scientific trial, it is best interpreted as ``filtering'' the involved participants (or other units of study).
+
+It also serves as a primitive placeholder for more sophisticated branching constructs TBA.
+
+\subsubsection{\I nterve rule}
+
 \begin{align*}  
-  (\I\text{-eval}) &\quad \frac{\U, \Int_i^x(\MU) \vdash \R : \D}{\U, \MU \vdash \I_i^x; \R : \D} \\[1.5em]
+  (\I\text{-eval}) &\quad \frac{\U, \Int_i^x(\MU) \vdash \R \dto \D}{\U, \MU \vdash \I_i^x; \R \dto \D} \\[1.5em]
 \end{align*}
 
-This rule defines the semantics of the $\I$ ``intervene'' term. Intuitively, a program $\R_0; \I_i^x; \R_1$ returns a result in which the meta-universe in which the sequel $\R_1$ is evaluated differs from that in which $\R_0$ by an application of the intervention operator $\Int_i^x: \MU \to \MU$ - which ``forces'' $X_i$ to take value $x$ in the remainder of the program.
+This rule defines the semantics of the $\I$ ``intervene'' term. Intuitively, a program $\R_0; \I_i^x; \R_1$ returns a result in which the meta-universe in which the sequel $\R_1$ is evaluated differs from that in which $\R_0$ by an application of the intervention operator $\Int_i^x\dto \MU \to \MU$ - which ``forces'' $X_i$ to take value $x$ in the remainder of the program.
 
 This highlights the expressive power of the separation of modelling concerns into a statistical universe $\U$ and a casual meta-universe $\MU$. It may be more intuitively obvious that an experiment can perform inference about a fixed meta-universal paramter $\theta$ by running repeated trials across differing universal draws $\U$ - e.g. by obtaining many distinct participants in the trials - but the semantics of the $\I$ term highlight that fixing $\U$, and varying $\MU$ - e.g. by performing measurements before and after structural interventions in the causal mechanisms under study - is equally expressible. Further, evaluation will show that the ability to separately vary both $\U$ and $\MU$ provides strict improvements in inferential power.
 
+\subsubsection{\M easure rule}
+
 \begin{align*}
-  (\M\text{-eval}) &\quad \frac{\U, \MU \vdash \R : \D}{\U, \MU \vdash \M_{i}; \R : \O_i(\U, \MU); \D}
+  (\M\text{-eval}) &\quad \frac{\U, \MU \vdash \R \dto \D}{\U, \MU \vdash \M_{i}; \R \dto \O_i(\U, \MU); \D}
 \end{align*}
 
 Finally this rule defines of the $\M$ ``measure'' term. perhaps the most straightforward of the three \AIM terms, $\R_0; \M_i; \R_1$ computes the value of $X_i$ post-evaluation of $\R_0$, and appends that value to the running stack of results.
@@ -120,7 +135,7 @@ In particular, we can now note that the measurable result $\D$ of a program $\R$
 
 \newcommand{\F}{\mathbb{F}}
 
-The above semantics, inhabiting the judgement $\U, \MU \vdash \R : \D$, suffices to characterize the behavior of \AIM programs as computationally explicit \textit{functions}:
+The above semantics, inhabiting the judgement $\U, \MU \vdash \R \dto \D$, suffices to characterize the behavior of \AIM programs as computationally explicit \textit{functions}:
 
 \begin{equation*}
 \F(\R) : (\U, \MU) \to \D
