@@ -71,7 +71,7 @@ To address experimental procedures that can interact with populations in statist
 \text{Result } \D &:= \epsilon \mid \X ; \D 
 \end{align*}
 
-$\T$ is an \AIM term (whose semantics will shortly be explicated)\footnote{in its current form, $\A\I\M$ programs can be reduced to equivalent $\I\M$ expressions with output post-processing (i.e. the $\A$ operator is redundant), but but the current $\A$ construct can be naturally extended to a non-redundant branching construct in future forms}, $\R$, an \AIM program, is a sequence of zero or more terms ($\R = \T^*$), and $\D$, an \AIM result, is a sequence of zero or more values from the codomain $\X$ of our random variables $X_i$.
+$\T$ is an \AIM term (whose semantics will shortly be explicated)\footnote{in its current form, $\A\I\M$ programs can be reduced to equivalent $\I\M$ expressions with output post-processing (i.e. the $\A$ operator is redundant), but but the current $\A$ construct can be naturally extended to a non-redundant branching construct in future forms}, $\R$, an \AIM program, is a sequence of zero or more terms ($\R = \T^*$), and $\D$, an \AIM result, is a sequence of zero or more values from the domain $\X$ of our random variables $X_i$.
 
 To briefly motivate this term language, we provide the following interpretations of the three operators:
 
@@ -93,16 +93,16 @@ Recall $\Gamma := (\mathcal{U}, \Theta, \mathcal{O}, \mathcal{I})$ specifies a c
 Interpreted as of ``in universe $\U$, in meta-universe $\MU$, \AIM program $\R$ evaluates to result $\D$'', and is derived as follows:
 
 \begin{align*}
-  (\A^+\text{-eval}) &\quad \frac{\U, \MU \vdash \R : \D \quad \mathcal{O}_i(\U, \MU) = \X}{\U, \MU \vdash \A^{\X}_{i} ; \R : \D} \\[1.5em]
-  (\A^-\text{-eval}) &\quad \frac{\mathcal{O}_i(\U, \MU) \ne \X}{\U, \MU \vdash \A^{\X}_{i} ; \R : \epsilon}
+  (\A^+\text{-eval}) &\quad \frac{\U, \MU \vdash \R : \D \quad \mathcal{O}_i(\U, \MU) = x}{\U, \MU \vdash \A^{x}_{i} ; \R : \D} \\[1.5em]
+  (\A^-\text{-eval}) &\quad \frac{\mathcal{O}_i(\U, \MU) \ne x}{\U, \MU \vdash \A^{x}_{i} ; \R : \epsilon}
 \end{align*}
 
-These two rules define the semantics of the $\A$ ``assign'' term. Intuitively, a program containing a particular $\A$ term at point $\R_0; \A_i^\X; \R_1$ evaluates to the result of $\R_0; \R_1$ if $X_i = \X$ at that point, and to just the result of $\R_0$ otherwise. In this sense it is functionally equivalent to a conditional ``abort'' or ``assert''. In the context of a broader scientific trial, it is best interpreted as ``filtering'' the involved participants (or other units of study).
+These two rules define the semantics of the $\A$ ``assign'' term. Intuitively, a program containing a particular $\A$ term at point $\R_0; \A_i^x; \R_1$ evaluates to the result of $\R_0; \R_1$ if $X_i = x$ at that point, and to just the result of $\R_0$ otherwise. In this sense it is functionally equivalent to a conditional ``abort'' or ``assert''. In the context of a broader scientific trial, it is best interpreted as ``filtering'' the involved participants (or other units of study).
 \begin{align*}  
-  (\I\text{-eval}) &\quad \frac{\U, \Int_i^\X(\MU) \vdash \R : \D}{\U, \MU \vdash \I_i^\X; \R : \D} \\[1.5em]
+  (\I\text{-eval}) &\quad \frac{\U, \Int_i^x(\MU) \vdash \R : \D}{\U, \MU \vdash \I_i^x; \R : \D} \\[1.5em]
 \end{align*}
 
-This rule defines the semantics of the $\I$ ``intervene'' term. Intuitively, a program $\R_0; \I_i^\X; \R_1$ returns a result in which the meta-universe in which the sequel $\R_1$ is evaluated differs from that in which $\R_0$ by an application of the intervention operator $\Int_i^\X: \MU \to \MU$ - which ``forces'' $X_i$ to take value $\X$ in the sequel.
+This rule defines the semantics of the $\I$ ``intervene'' term. Intuitively, a program $\R_0; \I_i^x; \R_1$ returns a result in which the meta-universe in which the sequel $\R_1$ is evaluated differs from that in which $\R_0$ by an application of the intervention operator $\Int_i^x: \MU \to \MU$ - which ``forces'' $X_i$ to take value $x$ in the remainder of the program.
 
 This highlights the expressive power of the separation of modelling concerns into a statistical universe $\U$ and a casual meta-universe $\MU$. It may be more intuitively obvious that an experiment can perform inference about a fixed meta-universal paramter $\theta$ by running repeated trials across differing universal draws $\U$ - e.g. by obtaining many distinct participants in the trials - but the semantics of the $\I$ term highlight that fixing $\U$, and varying $\MU$ - e.g. by performing measurements before and after structural interventions in the causal mechanisms under study - is equally expressible. Further, evaluation will show that the ability to separately vary both $\U$ and $\MU$ provides strict improvements in inferential power.
 
@@ -112,7 +112,7 @@ This highlights the expressive power of the separation of modelling concerns int
 
 Finally this rule defines of the $\M$ ``measure'' term. perhaps the most straightforward of the three \AIM terms, $\R_0; \M_i; \R_1$ computes the value of $X_i$ post-evaluation of $\R_0$, and appends that value to the running stack of results.
 
-In particular, we can now note that the measurable result $\D$ of a program $\R$ that terminates naturally (i.e. can be evaluated without invoking the $\A^-$ ``abort'' rule) is a vector of values $\X$ equal in length to the number of $\M$ terms in the program. If evaluation instead invokes the abort rule at program point $\R = \R_0; \A; \R_1$, then the result $\D$ is a vector of values equal in length to the number of $\M$ terms in $\R_0$ (i.e. equal to the result of $\R_0$).
+In particular, we can now note that the measurable result $\D$ of a program $\R$ that terminates naturally (i.e. can be evaluated without invoking the $\A^-$ ``abort'' rule) is a vector of values from $\X$ equal in length to the number of $\M$ terms in the program. If evaluation instead invokes the abort rule at program point $\R = \R_0; \A; \R_1$, then the result $\D$ is a vector of values equal in length to the number of $\M$ terms in $\R_0$ (i.e. equal to the result of $\R_0$).
 
 \subsection{Functional Denotation}
 
@@ -213,7 +213,7 @@ This shows the $(P_f, P_d)$ characteristic for varying $\eta$ for various experi
 
 \includegraphics[width=0.85\linewidth]{bigger_pic.png}
 
-This shows the frontiers for a wider range of programs, whose definitions in our ocaml version of this math is also provided below (for loose reference):
+This shows the frontiers for a wider range of programs, whose definitions in our ocaml version of this math is also provided below (for loose reference). In particular, this latter graph shows that not all estimators exhibit uniform prefernetiablity.
 
 \includegraphics[width=0.85\linewidth]{code.png}
 
