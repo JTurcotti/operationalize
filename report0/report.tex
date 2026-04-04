@@ -186,7 +186,7 @@ Where braket notation expresses the ``do'' operator and several other grammatica
 
 \subsection{Algebraic Semantics}
 
-\textit{\textbf{[Section WIP]}}\\
+%\textit{\textbf{[Section WIP]}}\\
 
 The prior subsection investigated the denotationalization of \AIM programs through embeddings into the space of transforms on probability distributions ($\U \times \MU \to \P^\D$).
 
@@ -198,7 +198,7 @@ However, even a program semantics that reduces to intuitive algebraic transforms
 
 \subsubsection{Probability Monads}
 
-\textit{\textbf{[Section WIP]}}\\
+%\textit{\textbf{[Section WIP]}}\\
 
 Instead of directly working with probabilistic denotations of programs, the interaction of a program with probabilities/distribution objects can be modelled directly with \textit{distribution monads} (equivalently, \textit{probability}, or (to reach the continuous case) \textit{Giry}, monads). This is indeed the representation that \texttt{math-comp/analysis} and \texttt{EasyCrpyt/certicrpyt} rely on. Further direct exposition is well described by Haskell's \href{https://hackage.haskell.org/package/monad-bayes}{\texttt{monad-bayes}} as well.
 
@@ -217,7 +217,7 @@ Our artifact \texttt{../operationalize.ml} is an example of a domain in which $\
 
 \subsubsection{ITrees}
 
-\textit{\textbf{[Section WIP]}}\\
+%\textit{\textbf{[Section WIP]}}\\
 
 Shifting from a direct representation of the operation of \AIM programs as transforms on $\P^\D$ to a monadic representation reduces most proof goals from numerical mathematics to symbolic aplication of the monad laws. Indeed, to most users, the monad laws likely represent more accessible (intensional) probabilistic intuition than the laws of summation, convulution, and enumeration relief upon in more ``direct'' (extensional) representations of probability.
 
@@ -225,13 +225,13 @@ But the reduction of \AIM semantic analysis to manipulation of monad rules and o
 
 This motivates an elegant, modern presentation of the semantics of programs operating against a monad: \textit{interaction trees}.
 
-Instead of denotationalizing programs as specific instances of monadic computation, \textit{itrees} assume only the existence only of a \textit{free monad}\footnote{a monad with no properties except those common to all monads}, and constructs programs not as particular inductive instances of the monad, but as coinductive instances of procedures that progress\footnote{to an (optional) point of termination} through a mix of ``internal'' computation steps (i.e. computation that does not depend on the monad) and external ``interaction'' steps (that split the program into a prequel that terminates in a ``request'' to the monad, and a sequel continuation that depends on the ``result'' of that request).
+Instead of denotationalizing programs as specific instances of monadic computation, \textit{itrees} assume only the existence of a \textit{free monad}\footnote{i.e. a monad with no properties except those common to all monads}, and constructs programs not as particular inductive instances of the monad, but as coinductive instances of procedures that progress\footnote{to an (optional) point of termination} through a mix of ``internal'' computation steps (i.e. computation that does not depend on the monad) and external ``interaction'' steps (that split the program into a prequel that terminates in a ``request'' to the monad, and a sequel continuation that depends on the ``result'' of that request).
 
 With programs and environments defined in this itree style, programs, as ASTs of requests to the environment, and environments, as stateful servers of those requests, can be seperately analyzed, then compiled together via a semantics-preserving ``handler'' that matches requests and responses. 
 
 \subsubsection{Itree Equivalence}
 
-\textit{\textbf{[Section WIP]}}\\
+%\textit{\textbf{[Section WIP]}}\\
 
 ITrees are powerful not just as an elegant representation of the interface between programs and their environment, but as a framework to refine program/environment semantics via equivalence with respect to that interface.
 
@@ -243,26 +243,25 @@ Proofs that depend only on equivalence up to tau are thus stable in a very gener
 
 \subsubsection{Applications of ITree Equivalence to \AIM Programs}
 
-\textit{\textbf{[Section WIP]}}\\
+%\textit{\textbf{[Section WIP]}}\\
 
 \newcommand{\OI}{\ensuremath{(\O, \mathcal{I})~}}
 
-The environment in which \AIM programs operate is the universe/meta-universe pair $(\U, \MU)$. Yet the inference rules above defining operational semantics for \AIM program relies on $\U$ and $\MU$ only through the functions $\O$ and $\mathcal{I}$. This allows \OI to form the signature of interaction between program and environment in an itree-based characterization of \AIM program semantics.
+The environment in which \AIM programs operate is the universe/meta-universe pair $(\U, \MU)$. Yet the inference rules above defining operational semantics for \AIM program rely on $\U$ and $\MU$ only through the functions $\O$ and $\mathcal{I}$. This allows \OI to form the signature of interaction between program and environment in an itree-based characterization of \AIM program semantics.
 
 As a powerful motivating example, consider the following theorem:
 
+
+
 \begin{equation*}
-  \A_Z\A_X\M_Y \equiv_\tau \A_Z\I_X\M_Y \iff \text{no-backdoor}(X \to Y \mid Z)
+  \A_Z\A_X\M_Y \cong_\tau \A_Z\I_X\M_Y \iff \text{no-backdoor}(X \to Y \mid Z)
 \end{equation*}
 
 which draws a logical equivalence between certain program equivalencies and corresponding properties of the underlying causal graph. Refinements of this theorem to particular programs (experimental procedures) and environments (causal graphs) are a classic ``hello world'' of causal analysis.
 
-In this form though, the proof applies not just to particular instances of programs and environments, but to broad enough classes of program and environment that it functions as a \textit{verified optimization} in a general compilation pipeline. 
+In this form though, the proof applies not just to particular instances of programs and environments, but to broad enough classes of program and environment that it functions as a \textit{verified optimization} in a general compilation pipeline.
 
-Our exposition of \AIM programs as coinductive instances of \OI--interaction makes clear that ``equivalence up to tau'' is the right choice of program equivalence to craft stable, minimal proofs of theorems like this.
-
-Further expansion of this direction of analysis is a short-term research priority, and will be further reflected in this report as it progresses.
-
+For many properties such as the rewrite presented above, the dependence on the causal graph is mediated through a predicate ``\texttt{no-backdoor}'' (or equivalently, through conditional independencies). Prior work\footnote{Anna's thesis/PLDI '26 paper} shows that mechanized characterization of this predicate is practical.
 
 \section{Binary Hypothesis Testing}
 
