@@ -227,15 +227,19 @@ This motivates an elegant, modern presentation of the semantics of programs oper
 
 Instead of denotationalizing programs as specific instances of monadic computation, \textit{itrees} assume only the existence only of a \textit{free monad}\footnote{a monad with no properties except those common to all monads}, and constructs programs not as particular inductive instances of the monad, but as coinductive instances of procedures that progress\footnote{to an (optional) point of termination} through a mix of ``internal'' computation steps (i.e. computation that does not depend on the monad) and external ``interaction'' steps (that split the program into a prequel that terminates in a ``request'' to the monad, and a sequel continuation that depends on the ``result'' of that request).
 
+With programs and environments defined in this itree style, programs, as ASTs of requests to the environment, and environments, as stateful servers of those requests, can be seperately analyzed, then compiled together via a semantics-preserving ``handler'' that matches requests and responses. 
+
 \subsubsection{Itree Equivalence}
 
 \textit{\textbf{[Section WIP]}}\\
 
 ITrees are powerful not just as an elegant representation of the interface between programs and their environment, but as a framework to refine program/environment semantics via equivalence with respect to that interface.
 
-Since ITrees represent a program's interactions with the environment in an entirely syntactically distinct way from the other internal details of the program or the environment, equivalence of environmental interactions (``equivalence up to Tau'') becomes much easier to reason about than in the general case in which details of a program, its interactions with the environment, and the environment are all entangled.
+Since ITrees represent interactions as explicit syntactic nodes (Visible events), we can establish semantic equivalence using weak bisimulation (``Equivalence Up To Tau'' or \texttt{eutt}). This allows us to prove two programs are equivalent by structurally matching their external interactions, safely ignoring any finite number of internal, silent computation steps (Tau nodes).
 
-In particular, equivalence up to tau can often be derived from the composed application of simple rewrite rules. The rewrite rules can be justified in part from the free semantics of itrees, and in part from refining properties of the program and environment. Proofs that depend only on equivalence up to tau are thus stable in a very general way: any changes to the program or environment that do not invalidate the properties relied upon to justify the set of itree equivalence rewrite rules do not invalidate the proof.
+In practice, equivalence up to tau can often be derived from the compounded application of simple rewrite rules. The rewrite rules, in turn, can be justified from the free semantics of itrees in combination with refining properties of the program and environment.
+
+Proofs that depend only on equivalence up to tau are thus stable in a very general way: any changes to the program or environment that do not invalidate the properties relied upon to justify the set of itree equivalence rewrite rules do not invalidate the proof. Equivalently, we can say that itrees enable seperate reasoning about programs and their environment, or about program syntax and semantics.
 
 \subsubsection{Applications of ITree Equivalence to \AIM Programs}
 
@@ -252,6 +256,8 @@ As a powerful motivating example, consider the following theorem:
 \end{equation*}
 
 which draws a logical equivalence between certain program equivalencies and corresponding properties of the underlying causal graph. Refinements of this theorem to particular programs (experimental procedures) and environments (causal graphs) are a classic ``hello world'' of causal analysis.
+
+In this form though, the proof applies not just to particular instances of programs and environments, but to broad enough classes of program and environment that it functions as a \textit{verified optimization} in a general compilation pipeline. 
 
 Our exposition of \AIM programs as coinductive instances of \OI--interaction makes clear that ``equivalence up to tau'' is the right choice of program equivalence to craft stable, minimal proofs of theorems like this.
 
