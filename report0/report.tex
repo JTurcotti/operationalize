@@ -3,6 +3,7 @@
 \usepackage{braket}
 \usepackage{graphicx}
 \usepackage{vcounter}
+\usepackage{hyperref}
 
 \begin{document}
 
@@ -91,6 +92,12 @@ To briefly motivate this term language, we provide the following interpretations
 
 \subsection{Operational Semantics}
 
+An operational semantics interprets programs as compositional transforms on state. Arguably, this is the presentation of semantics that maps most directly to programmer intuition, and aligns most closely with some of our most fundamental models of execution; like Turing machines. We thus present an operational semantics below for \AIM as way to ground the intuition for their meaning presented above.
+
+This operational semantics forms the core of the enumerative boolean engine we implemented in the accompanying artifact \texttt{../operationalize.ml}. For more realistic domains, enumerative exploration of the state transforms defined by operational semantics is infeasible. Thus, in subsequent sections, we explore more direct (denotational/axiomatic) semantics for \AIM programs that are less intuitive (the presentation \textit{requires} intutition to use rather than \texttt{builds} intuition to use), but lend themselves more directly to scalable implementation.
+
+
+
 Recall $\Gamma := (\mathcal{U}, \Theta, \mathcal{O}, \mathcal{I})$ specifies a choice of universe, meta-universe, and operations for observation and intervention. Taking $\O$ and $\Int$ as fixed artifacts of the data representation, the following judgement form suffices to encode an \textit{evaluation semantics} (i.e. operational semantics) for \AIM programs:
 
 \newcommand{\dto}{\downarrow}
@@ -163,7 +170,7 @@ Each of estimators and quantities above is called a ``non-bayesian'' because it 
 
 \renewcommand{\P}{\mathcal{P}}
 
-The remainder of this report, sans a brief digression on a direct probabilistic denotation of \AIM programs that does not depend on operationalizing their semantics, will be concerned with the specific case of implementing \textit{likelihood ratio tests}, but the reduction of a broad class of qualitiative modelling concerns to known procedures on the conditional distributions (referred to in statistics as the ``modelling family'') $\P = \{p_{\D ; \MU}(\cdot ; \theta)\}_{\theta \in \MU}$\footnote{or $\{p_{\D \mid \MU}(\cdot \mid \theta)\}_{\theta \in \MU}$ in the bayesian case} provides a much greater set of tools of relevance to the overarching \AIM of experimental analysis
+Our artifact \texttt{../operationalize.ml} relies on the specific case of implementing \textit{likelihood ratio tests}, but the reduction of a broad class of qualitiative modelling concerns to known procedures on the conditional distributions (referred to in statistics as the ``modelling family'') $\P = \{p_{\D ; \MU}(\cdot ; \theta)\}_{\theta \in \MU}$\footnote{or $\{p_{\D \mid \MU}(\cdot \mid \theta)\}_{\theta \in \MU}$ in the bayesian case} provides a much greater set of tools of relevance to the overarching aim of experimental analysis
 
 \subsubsection{Direct Probabilistic Denotations}
 
@@ -177,9 +184,43 @@ Without delving too far into this concern, we note that \AIM programs can altern
 
 Where braket notation expresses the ``do'' operator and several other grammatical constructs are used without explanation. Further work will thisupon expound.
 
+\subsection{Algebraic Semantics}
+
+The prior subsection investigated the denotationalization of \AIM programs through embeddings into the space of transforms on probability distributions ($\U \times \MU \to \P^\D$).
+
+In the worst case scenario for mechanized analysis, these transforms are represented with an axiomitization of the reals and of real analysis (see \texttt{math-comp/analysis} library on github).
+
+More realistically, proofs could rely on a presentation of distributions and transforms on distributions that exposes a sufficient set of ``basic'' facts about probability to reason, in most cases, only through those facts (see \texttt{affeldt-aist/infotheo} or \texttt{EasyCrypt/certicrypt}).
+
+However, even a program semantics that reduces to intuitive algebraic transforms on distributions is far more general that is needed to analyze probabilistic programs as simple as \AIM programs.
+
+\subsubsection{Probability Monads}
+
+Instead of directly working with probabilistic denotations of programs, the interaction of a program with probabilities/distribution objects can be modelled directly with \textit{distribution monads} (equivalently, \textit{probability}, or (to reach the continuous case) \textit{Giry}, monads). This is indeed the representation that \texttt{math-comp/analysis} and \texttt{EasyCrpyt/certicrpyt} rely on. Further direct exposition is well described by Haskell's \href{https://hackage.haskell.org/package/monad-bayes}{\texttt{monad-bayes}} as well.
+
+Briefly, at a high-level, probability distributions such as out $\P^\D$ can be seen to be well-modelled by monads by the following assignments:
+
+\begin{align*}
+  \eta&: \D \to \P^\D \\
+  \mu&: \P^{\P^\D} \to \P^\D \\        
+\end{align*}
+
+Where $\eta$ (unit), creates point masses\footnote{alternatively interpreted as \textit{dirac deltas}, or geometrically, as complete and non-redundant indexing into the vertex set of the simplex $\P^\D$} and $\mu$ (join), collapses distributions of distributions to distributions\footnote{the feasibility of which is also described as the ``law of total probability''}.
+
+The choice of $\eta$ for implementation of the probability monad is an object construction that usually directly corresponds to the data construction used to represent distributions. The choice of $\mu$, on the other hand, embodies not just algebraically obvious reductions, but complex tradeoffs between the computational feasibility and numerical accuracy of inference on the epresented programs.
+
+Our artifact \texttt{../operationalize.ml} is an example of a domain in which $\D$ is sufficiently simple that both $\eta$ and $\mu$ have an obvious efficient implementation. We defer to working implementations above for reasoing through this tradeoff in broader domains.
+
+\subsubsection{ITree equivalence}
+
+
+
+
+
+
 \section{Binary Hypothesis Testing}
 
-Of particular concern is the following scenario:
+Though much of this report is intended to form the basis for a broad and rich space of mathematical analyses whose complexity exceeds the progress made in their exploration, the case of \textit{boolean/binary classification} lends itself to a straightforwards operationalize whose evaluation represents the first empirical evidence of the utility of \AIM programs.
 
 \newcommand{\Rtest}{\R_{\text{test}}}
 \newcommand{\Rtrain}{\R_{\text{train}}}
@@ -187,7 +228,7 @@ Of particular concern is the following scenario:
 \newcommand{\Dtrain}{\D_{\text{train}}}
 
 
-Given two \AIM programs, $\Rtest, \Rtrain$, derive a procedure for estimating the results of $\Rtest$ given access to the results of $\Rtrain$. Further, assume that $$\Dtest \equiv \mathbb{B} \equiv\{0, 1\} \equiv \{H_1, H_0\}$$ i.e., $\Rtest$ is a ``binary hypothesis test'' - whose values can be characterized by a single bit, and whose outcomes are often referred to as $H_1$ (effect) and $H_0$ (null hypothesis).
+In particular, given two \AIM programs, $\Rtest, \Rtrain$, derive a procedure for estimating the results of $\Rtest$ given access to the results of $\Rtrain$. Further, assume that $$\Dtest \equiv \mathbb{B} \equiv\{0, 1\} \equiv \{H_1, H_0\}$$ i.e., $\Rtest$ is a ``binary hypothesis test'' - whose values can be characterized by a single bit, and whose outcomes are often referred to as $H_1$ (effect) and $H_0$ (null hypothesis).
 
 \subsection{Liklihood Ratio Tests}
 
