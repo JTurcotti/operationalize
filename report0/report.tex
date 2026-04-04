@@ -186,6 +186,8 @@ Where braket notation expresses the ``do'' operator and several other grammatica
 
 \subsection{Algebraic Semantics}
 
+\textit{\textbf{section WIP}}\\
+
 The prior subsection investigated the denotationalization of \AIM programs through embeddings into the space of transforms on probability distributions ($\U \times \MU \to \P^\D$).
 
 In the worst case scenario for mechanized analysis, these transforms are represented with an axiomitization of the reals and of real analysis (see \texttt{math-comp/analysis} library on github).
@@ -195,6 +197,8 @@ More realistically, proofs could rely on a presentation of distributions and tra
 However, even a program semantics that reduces to intuitive algebraic transforms on distributions is far more general that is needed to analyze probabilistic programs as simple as \AIM programs.
 
 \subsubsection{Probability Monads}
+
+\textit{\textbf{section WIP}}\\
 
 Instead of directly working with probabilistic denotations of programs, the interaction of a program with probabilities/distribution objects can be modelled directly with \textit{distribution monads} (equivalently, \textit{probability}, or (to reach the continuous case) \textit{Giry}, monads). This is indeed the representation that \texttt{math-comp/analysis} and \texttt{EasyCrpyt/certicrpyt} rely on. Further direct exposition is well described by Haskell's \href{https://hackage.haskell.org/package/monad-bayes}{\texttt{monad-bayes}} as well.
 
@@ -213,6 +217,8 @@ Our artifact \texttt{../operationalize.ml} is an example of a domain in which $\
 
 \subsubsection{ITrees}
 
+\textit{\textbf{section WIP}}\\
+
 Shifting from a direct representation of the operation of \AIM programs as transforms on $\P^\D$ to a monadic representation reduces most proof goals from numerical mathematics to symbolic aplication of the monad laws. Indeed, to most users, the monad laws likely represent more accessible (intensional) probabilistic intuition than the laws of summation, convulution, and enumeration relief upon in more ``direct'' (extensional) representations of probability.
 
 But the reduction of \AIM semantic analysis to manipulation of monad rules and operators relies upon the specific representation of probability and probabilistic inference as a monad functor with accopanying implementations of $\eta$ and $\mu$. Whereas, in theory, equivalence of \AIM programs should not depend on the particular choice of probability monad.
@@ -223,6 +229,8 @@ Instead of denotationalizing programs as specific instances of monadic computati
 
 \subsubsection{Itree Equivalence}
 
+\textit{\textbf{section WIP}}\\
+
 ITrees are powerful not just as an elegant representation of the interface between programs and their environment, but as a framework to refine program/environment semantics via equivalence with respect to that interface.
 
 Since ITrees represent a program's interactions with the environment in an entirely syntactically distinct way from the other internal details of the program or the environment, equivalence of environmental interactions (``equivalence up to Tau'') becomes much easier to reason about than in the general case in which details of a program, its interactions with the environment, and the environment are all entangled.
@@ -230,6 +238,8 @@ Since ITrees represent a program's interactions with the environment in an entir
 In particular, equivalence up to tau can often be derived from the composed application of simple rewrite rules. The rewrite rules can be justified in part from the free semantics of itrees, and in part from refining properties of the program and environment. Proofs that depend only on equivalence up to tau are thus stable in a very general way: any changes to the program or environment that do not invalidate the properties relied upon to justify the set of itree equivalence rewrite rules do not invalidate the proof.
 
 \subsubsection{Applications of ITree Equivalence to \AIM Programs}
+
+\textit{\textbf{section WIP}}\\
 
 \newcommand{\OI}{\ensuremath{(\O, \mathcal{I})~}}
 
