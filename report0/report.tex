@@ -205,17 +205,51 @@ Briefly, at a high-level, probability distributions such as out $\P^\D$ can be s
   \mu&: \P^{\P^\D} \to \P^\D \\        
 \end{align*}
 
-Where $\eta$ (unit), creates point masses\footnote{alternatively interpreted as \textit{dirac deltas}, or geometrically, as complete and non-redundant indexing into the vertex set of the simplex $\P^\D$} and $\mu$ (join), collapses distributions of distributions to distributions\footnote{the feasibility of which is also described as the ``law of total probability''}.
+Where $\eta$ (unit), creates point masses\footnote{alternatively interpreted as \textit{dirac deltas}, or geometrically, as indexing into the vertex set of the simplex $\P^\D$} and $\mu$ (join), collapses distributions of distributions to distributions\footnote{the feasibility of which is also described as the ``law of total probability''}.
 
 The choice of $\eta$ for implementation of the probability monad is an object construction that usually directly corresponds to the data construction used to represent distributions. The choice of $\mu$, on the other hand, embodies not just algebraically obvious reductions, but complex tradeoffs between the computational feasibility and numerical accuracy of inference on the epresented programs.
 
 Our artifact \texttt{../operationalize.ml} is an example of a domain in which $\D$ is sufficiently simple that both $\eta$ and $\mu$ have an obvious efficient implementation. We defer to working implementations above for reasoing through this tradeoff in broader domains.
 
-\subsubsection{ITree equivalence}
+\subsubsection{ITrees}
 
+Shifting from a direct representation of the operation of \AIM programs as transforms on $\P^\D$ to a monadic representation reduces most proof goals from numerical mathematics to symbolic aplication of the monad laws. Indeed, to most users, the monad laws likely represent more accessible (intensional) probabilistic intuition than the laws of summation, convulution, and enumeration relief upon in more ``direct'' (extensional) representations of probability.
 
+But the reduction of \AIM semantic analysis to manipulation of monad rules and operators relies upon the specific representation of probability and probabilistic inference as a monad functor with accopanying implementations of $\eta$ and $\mu$. Whereas, in theory, equivalence of \AIM programs should not depend on the particular choice of probability monad.
 
+This motivates an elegant, modern presentation of the semantics of programs operating against a monad: \textit{interaction trees}.
 
+Instead of denotationalizing programs as specific instances of monadic computation, \textit{itrees} assume only the existence only of a \textit{free monad}\footnote{a monad with no properties except those common to all monads}, and constructs programs not as particular inductive instances of the monad, but as coinductive instances of procedures that progress\footnote{to an (optional) point of termination} through a mix of ``internal'' computation steps (i.e. computation that does not depend on the monad) and external ``interaction'' steps (that split the program into a prequel that terminates in a ``request'' to the monad, and a sequel continuation that depends on the ``result'' of that request).
+
+Since the evaluation (destruction) of itrees is equivalent to the construction of free monads, itrees are often referred to as ``coninductive (variants of) free monads''. \footnote{The power of this duality arises from the polymorphism afforded by using free monads as an ``interface'' between a program and its environment; on the monad (environment) side, evaluation via a concrete computational monad relies on the program only through its semantics against the free monad; on the comonad (program) side, the semantics of a program that relies on nontrivial properties of the environment is always realizable as a refiement of its semantics operating against the free monad}
+
+\subsubsection{Itree Equivalence}
+
+ITrees are powerful not just as an elegant representation of the interface between programs and their environment, but as a framework to refine program/environment semantics via equivalence with respect to that interface.
+
+Since ITrees represent a program's interactions with the environment in an entirely syntactically distinct way from the other internal details of the program or the environment, equivalence up to environmental interactions (``equivalence up to Tau'') becomes much easier to reason about than in the general case in which details of a program, its interactions with the environment, and the environment are all entangled.
+
+In particular, equivalence up to tau can often be derived from the composed application of simple rewrite rules. The rewrite rules can be justified in part from the free semantics of itrees, and in part from refining properties of the program and environment. Proofs that depend only on equivalence up to tau are thus stable in a very general way: any changes to the program or environment that do not invalidate the properties relied upon to justify the set of itree equivalence rewrite rules do not invalidate the proof.
+
+\subsubsection{Applications of ITree Equivalence to \AIM Programs}
+
+\newcommand{\OI}{\ensuremath{(\O, \mathcal{I})~}}
+
+The environment in which \AIM programs operate is the universe/meta-universe pair $(\U, \MU)$. Yet the inference rules above defining operational semantics for \AIM program relies on $\U$ and $\MU$ only through the functions $\O$ and $\mathcal{I}$. This presents a natural refinement of a free probability monad to one that concretizes a causal graph, and exposes \OI such that the three laws of Pearl's do-calculus are respected. The semantics of \AIM programs thus reduce to the semantics of itrees against this \OI ``do-calculus'' signature.
+
+Thus itrees reduce reasoning about the correspondence between particular causal models and particular causal experiments to seperate reasoning about the models and experiments, respectively. In particular, models only ever need be analyzed up to their ability to answer \OI queries, and programs only ever need be analyzed up to their ability to ask \OI queries.
+
+As a powerful motivating example, consider the following theorem:
+
+\begin{equation*}
+  \A_Z\A_X\M_Y \equiv_\tau \A_Z\I_X\M_Y \iff \text{no-backdoor}(X \to Y \mid Z)
+\end{equation*}
+
+which draws a logical equivalence between certain program equivalencies and corresponding properties of the underlying causal graph. Refinements of this theorem to particular programs (experimental procedures) and environments (causal graphs) are a classic ``hello world'' of causal analysis.
+
+Our exposition of \AIM programs as coinductive instances of \OI--interaction makes clear that ``equivalence up to tau'' is the right choice of program equivalence to craft stable, minimal proofs of theorems like this.
+
+Further expansion of this direction of analysis is a short-term research priority, and will be further reflected in this report as it progresses.
 
 
 \section{Binary Hypothesis Testing}
