@@ -219,6 +219,26 @@ Even more importantly, $\bar{\gamma}$ can be constrained to be a clearly \textit
 \section{Certification Goals/Applications}
 \label{sec:cert}
 
+The above information processing pipeline can be interpreted operationally as follows:
+
+\begin{enumerate}
+\item Fix experimental and query programs $\R_{exp}$ and $\R_{qry}$, and a prior $p$ on $\U$ (see figure \ref{fig:two})
+\item Compute $\alpha^{(p)}$ - the ideal ``soft'' decision posterior estimate of $\D_{qry}$ (the theoretical result of $\R^{(p)}_{qry}$) given $\D_{exp}$ (the real result of $\R^{(p)}_{exp}$) (see figure \ref{fig:lik})
+\item Fix a ``hard'' decision $\A$ defined by a mapping $\beta: \mathbb{P}_p[\D_{qry}] \to \A$ - i.e. pick a concrete (non-probabilistic) property of distributions over $\D_{qry}$.
+\item Compute $\gamma$ - the ideal ``hard'' decision corresponding to the composition of computed $\alpha$ and chosen $\beta$ (see fig \ref{fig:comp}).
+\item (optional): Compute $\bar{\gamma}$ - an approximation of $\gamma$ up to error $\mathcal{E}$ that may be more interpretable or more computationally feasible to evaluate, infer, or represent.
+\end{enumerate}
+
+Each step of this operationalization lends itself to formal verification:
+
+\begin{description}
+\item[[1 $\to$ 2]] Computing $\alpha^{(p)}$ directly (i.e. intensionally via raw distributions) is computationally feasible only for tiny domains. Formal semantics of \AIM programs suffice to form and validate (extensional) algebraic representations of $\alpha$, or verify the sound approximacy of other intensional representations.
+\item[[2 $\to$ 3]] Various principles in theoretical statistic justify choices of $\beta$ - for example, maximum liklihood, minimax loss, minimum variance unbiased estimators, information theoretic encoding schemes. Formal verification can show the correspondence between these principled estimators and domain-specific choices.
+\item[[3 $\to$ 4, 5]] Similarly to the $[1 \to 2]$ case, exact specification of $\gamma$ is algebraically complex, and computationally infeasible. Verifiction of algebraic rewrites or computational approximation is highly valuable.
+\end{description}
+
+Together, some or all of these certification goals would provide a meaingful improvement to the state of the art in verified implementation of causal inference.
+
 \section{Conclusion}
 
 Section \ref{sec:mot} motivated the need to specialize the modelling tasks of general statistical/causal inference whenever possible, showing that when we focus on the particular situation of using one causal program to predict another in the context of a structural causal model, the vast majority of the complexity from the general case of overparametric inference can be eliminated.
@@ -227,7 +247,7 @@ Section \ref{sec:found} provided sufficient details of the modelling of causal p
 
 Section \ref{sec:frame} provieded a framework for extending high level mathematical characterizations of causal programs to specifications of concrete ``soft'' and ``hard'' estimators for causal queries at varying levels of abstraction.
 
-Finally, section \ref{sec:cert} discussed the application of this framework to certified decision making procedures.
+Finally, section \ref{sec:cert}  began to discus the application of this framework to certified decision making procedures.
 
 Together, this report begins to illustrate that the combination of general statistical inference, structural causal models, and concrete semantics for causal programs suffices to specify and certify efficient and explainable causal inferential procedures.
 
