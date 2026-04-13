@@ -17,7 +17,10 @@
 \author{Julia Turcotti, v2.0.\vcounter}
 \maketitle
 
+\tableofcontents
+
 \section{Motivation}
+\label{sec:mot}
 
 General statistical inference is a powerful tool for modelling the randomness of our universe, but does not always translate clearly into the modelling of programmatic procedures that dynamically observe, interact with, make decisions based on, and even modify that randomness. Such ``causal programs'' are not well understood by the state of the art.
 
@@ -153,14 +156,18 @@ Figure \ref{fig:lik} depicts this relationship: fixing $\R_{exp}$ and $\R_{qry}$
 
 The diagram, and in particular the mapping under $\R_{exp}$ is mutilated accordingly to show that $\R_{exp}$, in this setting, is evaluated in its ``backwards'' direction rather than ``forwards''.
 
-This posterior-characterized modelling domain already presents specialized opportunities for analysis and inference. In particular, any properties or characterizations of $\a^{(p)}$ are semantically meaningful properties or characterizations of the ability of the experimental procedure to answer the query. For example, the variance (or entropy) of $\alpha(d)$ averaged across, maximized across, or otherwise weighted across potential outcomes $d$ of $\R_{exp}$ represents the degree of certainty with which $\R_{qry}$ can be inferred from $\R_{exp}$.
+This posterior-characterized modelling domain already presents specialized opportunities for analysis and inference. In particular, any properties or characterizations of $\alpha^{(p)}$ are semantically meaningful properties or characterizations of the ability of the experimental procedure to answer the query. For example, the variance (or entropy) of $\alpha(d)$ averaged across, maximized across, or otherwise weighted across potential outcomes $d$ of $\R_{exp}$ represents the degree of certainty with which $\R_{qry}$ can be inferred from $\R_{exp}$.
 
 For small examples, reduction of the modelling domain to the construction or characterization of this induced $\alpha$ posterior may be sufficient. However, it is still very a high-dimensional mathematical object in the general case, and often further concretization is useful as described next.
 
 \subsection{``Hard'' Estimators and Classification}
 
+Practically, characterizing posteriors on $\D_{qry}$ is often much more information than we need. For example, if the query program measures an observable value before and after an intervention, we may only care to know whether the difference in those two measurements is at least $\delta$ with probability at least $(1- \epsilon)$ for  some thresholds $\epsilon$ and $\delta$\footnote{for example $\epsilon = 0.05$ is a standard ``p value'' threshold}.
+
+This may be modelled as a function $\beta$ that maps the complex space of distributions over $\D_{qry}$ to a much smaller (even binary) domain $\mathcal{A}$ representing answers to a particular question about that distribution. We can now attempt, instead of fully characterizing $\alpha$, to just characterize some $\gamma$ that directly provides an answer $\mathcal{A}$ for any observed value of $\D_{exp}$, but still corresponds to a theoretical composition of $\alpha$ and $\beta$. This relationship is depicted in figure \ref{fig:comp}.
+
 \begin{figure}[h]
-  \centering\Large
+  \centering\large
 % https://q.uiver.app/#q=WzAsNCxbMSwwLCJcXFRoZXRhIl0sWzAsMiwiXFxtYXRoY2Fse0R9X3tleHB9Il0sWzIsMiwiXFxtYXRoYmJ7UH1fcFtcXG1hdGhjYWx7RH1fe3FyeX1dIl0sWzQsMiwiXFxtYXRoY2Fse0F9Il0sWzAsMSwiXFxtYXRoY2Fse1J9X3tleHB9XnsocCl9IiwyLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoic3F1aWdnbHkifX19XSxbMCwyLCJcXG1hdGhjYWx7Un1fe3FyeX1eeyhwKX0iXSxbMSwyLCJcXGFscGhhXnsocCl9IiwxLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV0sWzIsMywiXFxiZXRhIl0sWzEsMywiXFxnYW1tYSIsMix7ImN1cnZlIjo1LCJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XV0=
 \begin{tikzcd}
 	& \Theta &&& \\
@@ -169,15 +176,60 @@ For small examples, reduction of the modelling domain to the construction or cha
 	\arrow["{\mathcal{R}_{exp}^{(p)}}"', squiggly, from=1-2, to=3-1]
 	\arrow["{\mathcal{R}_{qry}^{(p)}}", from=1-2, to=3-3]
 	\arrow["{\alpha^{(p)}}"{description}, dashed, from=3-1, to=3-3]
-	\arrow["\gamma"', curve={height=30pt}, dashed, from=3-1, to=3-5]
+	\arrow["\gamma"', curve={height=40pt}, dashed, from=3-1, to=3-5]
 	\arrow["\beta", from=3-3, to=3-5]
 \end{tikzcd}
   \caption{Complete pipeline}
   \label{fig:comp}
 \end{figure}
 
-\section{Certification Goals}
+Since $\gamma$ seeks to provide a answer that is a concrete value, not a distribution of values, it is referred to as a ``hard'' estimate.
 
+In its simplest form, when $\mathcal{A}$ is, for example, a boolean domain, a complete characterization of $\gamma$ is simply a partition of all possible results of the experimental program into ``yes'' and ``no'' sets corresponding to the ``correct'' (as defined by the remainder of the model) answer $\mathcal{A}$ given that result.
+
+When $\mathcal{A}$ is a largely, but still easily enumerable set, then inference of $\gamma$ is an only slightly more general classification task on potential results of the experimental procedure.
+
+\subsection{$\gamma$-Approximacy}
+
+Notably, the complete modelling domain specified in figure \ref{fig:comp} lends itself immediately to $\gamma$ \textit{-approximate} inference. Instead of directly computing $\mathcal{A}$ via $\gamma$ that is equivalent to a composition of $\alpha$ and $\beta$, we can choose an \textit{approximate} answer domain $\bar{\mathcal{A}}$, related to $\mathcal{A}$ through an \textit{error function} $\mathcal{E}$ (for which $\bar{\mathcal{A}} = \mathcal{A}$ is an obvious and often-appropriate choice with natural choices of $\mathcal{E}$), and obtained via an approximate estimator $\bar{\gamma}$. This new model is depicted in figure \ref{fig:approx}.
+
+\begin{figure}[h]
+  \centering\large
+% https://q.uiver.app/#q=WzAsNSxbMSwwLCJcXFRoZXRhIl0sWzAsMiwiXFxtYXRoY2Fse0R9X3tleHB9Il0sWzIsMiwiXFxtYXRoYmJ7UH1fcFtcXG1hdGhjYWx7RH1fe3FyeX1dIl0sWzQsMiwiXFxtYXRoY2Fse0F9Il0sWzQsMywiXFxiYXJ7XFxtYXRoY2Fse0F9fSJdLFswLDEsIlxcbWF0aGNhbHtSfV97ZXhwfV57KHApfSIsMix7InN0eWxlIjp7ImJvZHkiOnsibmFtZSI6InNxdWlnZ2x5In19fV0sWzAsMiwiXFxtYXRoY2Fse1J9X3txcnl9XnsocCl9Il0sWzEsMiwiXFxhbHBoYV57KHApfSIsMSx7InN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRhc2hlZCJ9fX1dLFsyLDMsIlxcYmV0YSJdLFsxLDQsIlxcYmFye1xcZ2FtbWF9IiwyLHsiY3VydmUiOjUsInN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRhc2hlZCJ9fX1dLFszLDQsIlxcbWF0aGNhbHtFfSIsMCx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6ImFycm93aGVhZCJ9LCJib2R5Ijp7Im5hbWUiOiJkb3R0ZWQifX19XV0=
+\begin{tikzcd}
+	& \Theta &&& \\
+	\\
+	{\mathcal{D}_{exp}} && {\mathbb{P}_p[\mathcal{D}_{qry}]} && {\mathcal{A}} \\
+	&&&& {\bar{\mathcal{A}}}
+	\arrow["{\mathcal{R}_{exp}^{(p)}}"', squiggly, from=1-2, to=3-1]
+	\arrow["{\mathcal{R}_{qry}^{(p)}}", from=1-2, to=3-3]
+	\arrow["{\alpha^{(p)}}"{description}, dashed, from=3-1, to=3-3]
+	\arrow["{\bar{\gamma}}"', curve={height=30pt}, dashed, from=3-1, to=4-5]
+	\arrow["\beta", from=3-3, to=3-5]
+	\arrow["{\mathcal{E}}", dotted, tail reversed, from=3-5, to=4-5]
+\end{tikzcd}
+  \caption{$\gamma$-approximate pipeline}
+  \label{fig:approx}
+\end{figure}
+
+Here, the obligation to show $\gamma$ as an exact composition of $\alpha$ and $\beta$ is relaxed. Instead, we can reason about bounding the error $\mathcal{E}$ indcued between the exact $\gamma$ and the approximate $\bar{\gamma}$. This is often sufficient.
+
+Even more importantly, $\bar{\gamma}$ can be constrained to be a clearly \textit{interpretable} family of models, such as deciison trees. This modelling scenario would thus suffice to show the conditions under which nuanced causal queries may be answered by a composition of a human-comprehensible data and a human-comphrenensible decision procedure on that data - like a ``flowchart'' style classification.
+
+\section{Certification Goals/Applications}
+\label{sec:cert}
+
+\section{Conclusion}
+
+Section \ref{sec:mot} motivated the need to specialize the modelling tasks of general statistical/causal inference whenever possible, showing that when we focus on the particular situation of using one causal program to predict another in the context of a structural causal model, the vast majority of the complexity from the general case of overparametric inference can be eliminated.
+
+Section \ref{sec:found} provided sufficient details of the modelling of causal programs to concretize further details of their analysis.
+
+Section \ref{sec:frame} provieded a framework for extending high level mathematical characterizations of causal programs to specifications of concrete ``soft'' and ``hard'' estimators for causal queries at varying levels of abstraction.
+
+Finally, section \ref{sec:cert} discussed the application of this framework to certified decision making procedures.
+
+Together, this report begins to illustrate that the combination of general statistical inference, structural causal models, and concrete semantics for causal programs suffices to specify and certify efficient and explainable causal inferential procedures.
 
 
 \end{document}
