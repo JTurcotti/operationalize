@@ -40,9 +40,9 @@ Unfortunately, in many domains, the parallel goals of explainability and express
 
 \subsection{Partial Solution: Structural Causal Models}
 
-\textit{Structural Causal Models} provide a powerful intersection of explainability and expressivity in the domain of causal inference. In particular, a \textit{causal structure} is assumed that constrain the dependence of observable quantities of interest to a small set of ``parents''; consisting of a mix of other observable values and hidden/latent ``unobservable'' values. The dependence of each such causal node on its parents is explainable as a small, simply-parameterized model, and the remaining signal that cannot be thus modelled is shunted into raw statistical inference on the unobserved values.
+\textit{Structural Causal Models} provide a powerful intersection of explainability and expressivity in the domain of causal inference. In particular, a \textit{causal structure} is assumed that constrains the dependence of observable quantities of interest to a small set of ``parents''; consisting of a mix of other observable values and hidden/latent ``unobservable'' values. The dependence of each such causal node on its parents is explainable as a small, simply-parameterized model, and the remaining signal that cannot be thus modelled is shunted into raw statistical inference on the unobserved values.
 
-Causal models thus enforce a powerful ``separation of concerns'': the explainable causal dependencies of observable quantities on each other are parameterized seperately from the remaining unexplainable statistical dependencies of those quantities on universal randomness. The parameterization of the model is thus split into the former \textit{causal parameters} an the latter \textit{statistical parameters}.
+Causal models thus enforce a powerful ``separation of concerns'': the explainable causal dependencies of observable quantities on each other are parameterized seperately from the remaining unexplainable statistical dependencies of those quantities on universal randomness. The parameterization of the model is thus split into the former \textit{causal parameters} and the latter \textit{statistical parameters}.
 
 Thus purely statistical operations (like sampling fresh units, conditioning on observable properties of units, and observing properties of units), and causal operations (``interventions'' that alter the causal mechanisms at play) are equally exprissible in structural causal models.
 
@@ -54,7 +54,9 @@ Unfortunately, directly reducing the problem of causal inference to the synthesi
 
 Our framework relies on simple formal descriptions of procedures for observing and interacting with the world (\AIM programs), and models their behavior directly through an information-processing pipeline. Notable, each step of the pipeline has clearly defined semantics and specifications, yielding composed specifications applying to the results of inference through the pipleine.
 
-Once built, this will allow specifications of strucutral causal models to be combined with specifications of data-gather progrmas and query programs to sythensize or validate estimators that directly answer the query in terms of gathered data. The estimator can be proven sound with respect to all assumptions and specifications with far greater precision that can be obtained directly through the application of general statistical inference.
+Once built, this will allow specifications of strucutral causal models to be combined with specifications of data-gathering programs and query programs to sythensize or validate estimators that directly answer the query in terms of gathered data.
+
+The estimator can be proven sound with respect to all assumptions and specifications with far greater precision that can be obtained directly through the application of general statistical inference.
 
 \section{Foundation: \AIM Semantics for Causal programs}
 \label{sec:found}
@@ -78,11 +80,17 @@ We define 4 modellings domains:
 \item[$\D$]: - the domain of ``results''/``return values'' of causal programs
 \end{description}
 
-Many design decisions influence the representation of these 4 domains. This report is motivated by a particular presentation of the domain $\R$ of causal programs consisting of \AIM programs: programs consisting of three atomic operations $\A$ (assign experimental conditions, equivalent to statistical conditioning), $\I$ (intervene, equivalent to replacement or removal of causal mechanisms), and $\M$ (measure, which produces the observable outputs of the program).
+Many design decisions influence the representation of these 4 domains. This report is motivated by a particular presentation of the domain $\R$ of causal programs consisting of \AIM programs: programs consisting of three atomic operations:
+\begin{description}
+\item[$\A$] : assign experimental conditions, equivalent to statistical conditioning
+\item[$\I$] : intervene, equivalent to replacement or removal of causal mechanisms
+\item[$\M$] : measure, which produces the observable outputs of the program)
+\end{description}
+
 
 Deferring to prior explanations of the exact semantics of \AIM programs, it suffices to note for the sequel that a sufficient description of their semantics takes the form of inhabiting/deciding the relation:
 \begin{description}
-\item[$\MU, U \vdash \R \dto \U$]: ``program $\R$ produces result $\D$ in the context of $\MU$ and $\U$''
+\item[$\boxed{\MU, U \vdash \R \dto \U}$]: ``program $\R$ produces result $\D$ in the context of $\MU$ and $\U$''
 \end{description}
 
 \section{Framework: Information Processing Pipeline}
@@ -90,11 +98,11 @@ Deferring to prior explanations of the exact semantics of \AIM programs, it suff
 
 Now assume that we have a semantics for causal programs $\R$ that deterministically produce outputs $\D$ in environments consisting of fixed $\U$ and $\MU$:
 
-$$\MU, \U \vdash \R \dto \U$$
+$$\boxed{\MU, \U \vdash \R \dto \U}$$
 
 Consider a partially Bayesian approach in which a natural prior $p$ for $\U$ exists\footnote{see: max entropy priors}. We can now consider $\R^{(p)}$ to be a probabilistic program that produces a \textit{distribution} over outputs $\D$ for any fixed $\MU$:
 
-$$\MU \vdash \R^{(p)} \dto \P_p[\D]$$
+$$\boxed{\MU \vdash \R^{(p)} \dto \P_p[\D]}$$
 
 This can be directly read as ``program $\R^{(p)}$ produces results distributed according to $\P_p[\D]$ in the context of $\MU$ when $\U$ is distributed according to $p$''.
 
@@ -232,9 +240,9 @@ The above information processing pipeline can be interpreted operationally as fo
 Each step of this operationalization lends itself to formal verification:
 
 \begin{description}
-\item[[1 $\to$ 2]] Computing $\alpha^{(p)}$ directly (i.e. intensionally via raw distributions) is computationally feasible only for tiny domains. Formal semantics of \AIM programs suffice to form and validate (extensional) algebraic representations of $\alpha$, or verify the sound approximacy of other intensional representations.
-\item[[2 $\to$ 3]] Various principles in theoretical statistic justify choices of $\beta$ - for example, maximum liklihood, minimax loss, minimum variance unbiased estimators, information theoretic encoding schemes. Formal verification can show the correspondence between these principled estimators and domain-specific choices.
-\item[[3 $\to$ 4, 5]] Similarly to the $[1 \to 2]$ case, exact specification of $\gamma$ is algebraically complex, and computationally infeasible. Verifiction of algebraic rewrites or computational approximation is highly valuable. In subdomains, \textit{synthesis} of $\gamma$ or $\bar{\gamma}$ up to certain bounded cost constraints may also be enabled.
+\item[$\boxed{1 \to 2}$] Computing $\alpha^{(p)}$ directly (i.e. intensionally via raw distributions) is computationally feasible only for tiny domains. Formal semantics of \AIM programs suffice to form and validate (extensional) algebraic representations of $\alpha$, or verify the sound approximacy of other intensional representations.
+\item[$\boxed{2 \to 3}$] Various principles in theoretical statistic justify choices of $\beta$ - for example, maximum liklihood, minimax loss, minimum variance unbiased estimators, information theoretic encoding schemes. Formal verification can show the correspondence between these principled estimators and domain-specific choices.
+\item[$\boxed{3 \to 4, (5)}$] Similarly to the $[1 \to 2]$ case, exact specification of $\gamma$ is algebraically complex, and computationally infeasible. Verifiction of algebraic rewrites or computational approximation is highly valuable. In subdomains, \textit{synthesis} of $\gamma$ or $\bar{\gamma}$ up to certain bounded cost constraints may also be enabled.
 \end{description}
 
 Together, some or all of these certification goals would provide a meaingful improvement to the state of the art in verified implementation of causal inference.
