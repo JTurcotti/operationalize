@@ -1,0 +1,151 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb}
+\usepackage{braket}
+\usepackage{graphicx}
+\usepackage{vcounter}
+\usepackage{hyperref, comment}
+
+\begin{document}
+
+\newcommand{\A}{\ensuremath{\mathbb{A}}}
+\newcommand{\I}{\ensuremath{\mathbb{I}}}
+\newcommand{\M}{\ensuremath{\mathbb{M}}}
+\newcommand{\AIM}{\A\I\M~}
+
+
+\title{\AIM Programs for Causal Inference}
+\author{Julia Turcotti, v1.0.\vcounter}
+\maketitle
+
+\tableofcontents
+
+\newpage
+
+\section{Terminology}
+\label{t}
+
+This preliminary section introduces the minimal terminology for statistics and casuality required to define, contextualize, and analyze \AIM programs.
+
+\subsection{Statistical Modelling}
+\label{sm}
+
+\newcommand{\X}{\mathcal{X}}
+\renewcommand{\P}{\mathcal{P}}
+\newcommand{\D}{\mathcal{D}}
+
+
+\begin{comment}
+
+Consider a population of units be interchangeable except for measurable variation in $N$ \textit{observable characteristics} $\{X_i \in \X\}_{i < N}$. \textit{Statistical analysis} then, broadly, consists of probabilistic analysis of random variables who take values in the $N$-dimensional space $\X^N$. A complete characterization of the randomness over $\X^N$ is a point in the \textit{probability simplex} $\P^{X^N}$ 
+
+Any function $\X^N \to \D$ for some set $\D$ (the \textit{domain}) may correspond to a procedure that observes properties of units to choose a return value from $\D$. Observing the procedure's return induces a \posterior}
+
+Observing 
+  
+\end{comment}
+
+
+\subsection{Causal Modelling}
+\label{cm}
+
+\newcommand{\MU}{\Theta}
+\newcommand{\U}{\mathcal{U}}
+
+\subsection{Causal Programs}
+\label{cp}
+
+\section{AIM Programs}
+\label{ap}
+
+A particular class of functions that can inhabit the type signature $\MU \times \U \to \D$ are \AIM programs.
+
+\subsection{Grammar}
+\label{g}
+
+\AIM programs consist of sequences of the following three terms, each of which has type signature $(\MU \times \U) \to (\MU \times \D)$
+
+\subsection{Semantics}
+\label{s}
+
+here's what AIM programs due
+
+note commutativity of same operators but not diff ones in general
+
+show why each hetergenous pari doesnt commute?
+
+\subsection{Comparative Expressivity}
+
+compare the exptressivity of AIm programs to other programs
+
+
+\section{AIM Programs Over Graphical Models}
+\label{aposcm}
+
+Here's how AIM programs get additional structure via the do calculus axioms when you have a graph model
+
+I-elim rewrites
+
+hetergenous commutativity
+
+
+\section{Causal Identifiability via AIM Programs}
+\label{civam}
+
+in general identifiability means that models that agree about all purely probabilistic models agree for a causal query - or equivalently that the causal query is a function of probabilistic queries.
+
+pearl says that if a causal queries expression as a probabilistic query cannot be reduced to elim the i operator it is not identifiable (clearly if it can be reduced it is identifiable)
+
+analagous result for rewrites directly in AIM?
+
+\section{General Inference via AIM Programs}
+\label{givap}
+
+Even if an AIM program's causal component is not reducible (identifiable), we can still perform interesting analysis
+
+
+\subsection{Evaluation of Statistical Estimators}
+\label{ese}
+
+show the markov chain, talk about performance definitons of estimators on it (bayesian and non bayesian)
+
+\subsection{Synthesis of Statistical Estimators}
+\label{sse}
+
+talk about ML estimates, mention broader estimates
+
+\subsection{Information Theoretic Measures}
+\label{itm}
+
+entropy, reduction in entropy, and mutual information, and channel capacity
+
+\section{Related Work}
+\label{rw}
+
+talk about related work
+
+
+\section{Future Work}
+\label{fw}
+
+\subsection{Mechanized Proofs}
+\label{mp}
+
+embed AIM semantics in a setting amendable to mechanized proofs
+
+\subsection{AIM Language Expansion}
+\label{ale}
+
+extend language to have more general branching and construcst
+
+
+\subsection{AIM Program Expressivity/Contextualization}
+
+compare to other languages, determine non-transferrable embeddings
+
+\subsection{Conctretize Modelling and Semantics}
+
+pick $\MU$, talk about particular cases of inference wrt it
+
+
+
+\end{document}

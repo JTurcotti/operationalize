@@ -1,0 +1,183 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb}
+\usepackage{braket}
+\usepackage{graphicx}
+\usepackage{vcounter}
+\usepackage{hyperref, comment, quiver}
+
+\begin{document}
+
+\newcommand{\A}{\ensuremath{\mathbb{A}}}
+\newcommand{\I}{\ensuremath{\mathbb{I}}}
+\newcommand{\M}{\ensuremath{\mathbb{M}}}
+\newcommand{\AIM}{\A\I\M~}
+
+
+\title{Model Specialization for Causal Programs}
+\author{Julia Turcotti, v2.0.\vcounter}
+\maketitle
+
+\section{Motivation}
+
+General statistical inference is a powerful tool for modelling the randomness of our universe, but does not always translate clearly into the modelling of programmatic procedures that dynamically observe, interact with, make decisions based on, and even modify that randomness. Such ``causal programs'' are not well understood by the state of the art.
+
+This report outlines a framework for extending statistical modelling to reason about causal programs with efficient computation and formal specification.
+
+You may skip to sections \ref{sec:found} and \ref{sec:frame} to find this report's contribution more immediately described with less context.
+
+\subsection{Failures of General Inference}
+
+In the modern age, ridiculously high-dimensional ``overparameterized'' inference is broadly considered tractable with two important caveats: \textit{explainability} and \textit{expressivity}.
+
+First, inference is only answered in an approximate black box sense; given an arbitrarily large set of existing samples, arbitrarily large sets of fresh samples can be generated, but insight into how or why that particular ``fit'' was obtained are not forthcoming. This is often referred to as a failure of \textit{explainability}.
+
+Second, not all problem domains are easily mapped to well-understood statistical models. This can produce a failure of \textit{expressivity}. In some domains, such as video comprehension, clever ``featurization'' provides this mapping. In others, such as \textit{causal} inference, the mapping relies on subtle, untestable assumptions. The results of inference can be very unstable with respect to these assumptions: small logical errors in the representation of problems can render the resultant analyses completely meaningless.
+
+Unfortunately, in many domains, the parallel goals of explainability and expressivity are fundamentally opposed. For example, increasing the dimension of parameterization comes at a nearly universal increase in expressivity at the cost of explainability. Other choices, such as forcing candidate overparameterized models to correspond to simpler ``underparamaterized'' models with human-readable semantics ensures some explainability at the cost of some expressivity.
+
+\subsection{Partial Solution: Structural Causal Models}
+
+\textit{Structural Causal Models} provide a powerful intersection of explainability and expressivity in the domain of causal inference. In particular, a \textit{causal structure} is assumed that constrain the dependence of observable quantities of interest to a small set of ``parents''; consisting of a mix of other observable values and hidden/latent ``unobservable'' values. The dependence of each such causal node on its parents is explainable as a small, simply-parameterized model, and the remaining signal that cannot be thus modelled is shunted into raw statistical inference on the unobserved values.
+
+Causal models thus enforce a powerful ``separation of concerns'': the explainable causal dependencies of observable quantities on each other are parameterized seperately from the remaining unexplainable statistical dependencies of those quantities on universal randomness. The parameterization of the model is thus split into the former \textit{causal parameters} an the latter \textit{statistical parameters}.
+
+Thus purely statistical operations (like sampling fresh units, conditioning on observable properties of units, and observing properties of units), and causal operations (``interventions'' that alter the causal mechanisms at play) are equally exprissible in structural causal models.
+
+To this extent, structural causal models can be said to faciliate a nearly-complete reduction of causal inference to general statistical inference.
+
+\subsection{Complete Solution: Specialiation to Causal Programs}
+
+Unfortunately, directly reducing the problem of causal inference to the synthesis and use of statistical ``black boxes'' is often unsatisfactory. All the problems of general inference lift through this reduction to become properties of general causal inference: ridiculously high dimensionality, limited explainability, and instability with respect to subtle assumptions. Most crucially, it is nearly impossible to establish that the inferred black boxes adhere to any meaningful \textit{specification} expressed in terms of the causal assumptions.
+
+Our framework relies on simple formal descriptions of procedures for observing and interacting with the world (\AIM programs), and models their behavior directly through an information-processing pipeline. Notable, each step of the pipeline has clearly defined semantics and specifications, yielding composed specifications applying to the results of inference through the pipleine.
+
+Once built, this will allow specifications of strucutral causal models to be combined with specifications of data-gather progrmas and query programs to sythensize or validate estimators that directly answer the query in terms of gathered data. The estimator can be proven sound with respect to all assumptions and specifications with far greater precision that can be obtained directly through the application of general statistical inference.
+
+\section{Foundation: \AIM Semantics for Causal programs}
+\label{sec:found}
+
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\R}{\mathcal{R}}
+\newcommand{\D}{\mathcal{D}}
+
+\newcommand{\U}{\mathcal{U}}
+\newcommand{\MU}{\Theta}
+\newcommand{\dto}{\downarrow}
+
+
+
+We define 4 modellings domains:
+
+\begin{description}
+\item[$\U$]: domain of ``unobservable states'' - i.e. assignments to the unobservable statistical terms in the structural causal model
+\item[$\MU$]: ``causal state'' - i.e. assignments of the particular relationships between observable terms and their causal parents
+\item[$\R$]: ``causal program'' - the space of programs that may be modelled
+\item[$\D$]: - the domain of ``results''/``return values'' of causal programs
+\end{description}
+
+Many design decisions influence the representation of these 4 domains. This report is motivated by a particular presentation of the domain $\R$ of causal programs consisting of \AIM programs: programs consisting of three atomic operations $\A$ (assign experimental conditions, equivalent to statistical conditioning), $\I$ (intervene, equivalent to replacement or removal of causal mechanisms), and $\M$ (measure, which produces the observable outputs of the program).
+
+Deferring to prior explanations of the exact semantics of \AIM programs, it suffices to note for the sequel that a sufficient description of their semantics takes the form of inhabiting/deciding the relation:
+\begin{description}
+\item[$\MU, U \vdash \R \dto \U$]: ``program $\R$ produces result $\D$ in the context of $\MU$ and $\U$''
+\end{description}
+
+\section{Framework: Information Processing Pipeline}
+\label{sec:frame}
+
+Now assume that we have a semantics for causal programs $\R$ that deterministically produce outputs $\D$ in environments consisting of fixed $\U$ and $\MU$:
+
+$$\MU, \U \vdash \R \dto \U$$
+
+Consider a partially Bayesian approach in which a natural prior $p$ for $\U$ exists\footnote{see: max entropy priors}. We can now consider $\R^{(p)}$ to be a probabilistic program that produces a \textit{distribution} over outputs $\D$ for any fixed $\MU$:
+
+$$\MU \vdash \R^{(p)} \dto \P_p[\D]$$
+
+This can be directly read as ``program $\R^{(p)}$ produces results distributed according to $\P_p[\D]$ in the context of $\MU$ when $\U$ is distributed according to $p$''.
+
+The details of efficiently translating representations of $p$ and $\R$ into representations of $\P_p[\D]$ are subtle in the general case, but for small dimension, it is a simple ``counting'' problem: the probability associated with result $\D$ is the sum of all probabilities associated with $\U$ that map under $\MU$ and $\R$ to $\D$.\footnote{in the general case, continuous and/or convex analysis or other approximation like MCMC may suffice}
+
+\subsection{Experimental and Query Programs}
+
+Our key insight for specializing the model domain is to consider a \textit{pair} of causal programs:
+
+\begin{description}
+\item[$\R_{exp}$]: ``experimental program'' - describes the causal program used to gather data about the world; must correspond to a practical procedure that can be performed to build a dataset of outcomes given access to a large pool of individuals or other units to evaluate
+\item[$\R_{qry}$]: ``query program'' - describes the causal program used to define the question about about the world we seek to answer; need not be practically executable itself
+\end{description}
+
+In general $\R_{qry}$ should be small and simple, so that predictions of its outcome are ``human readable'', but this may come at the cost of being practically realizable, but $\R_{exp}$ may be arbitrarily complex as needed to ensure correspondence to a realistic experimental procedure.
+
+\begin{figure}[h]
+  \centering\Large
+  % https://q.uiver.app/#q=WzAsMyxbMSwwLCJcXFRoZXRhIl0sWzAsMiwiXFxtYXRoYmJ7UH1fcFtcXG1hdGhjYWx7RH1fe2V4cH1dIl0sWzIsMiwiXFxtYXRoYmJ7UH1fcFtcXG1hdGhjYWx7RH1fe3FyeX1dIl0sWzAsMSwiXFxtYXRoY2Fse1Jfe2V4cH19XnsocCl9IiwyXSxbMCwyLCJcXG1hdGhjYWx7Ul97cXJ5fX1eeyhwKX0iXV0=
+\begin{tikzcd}
+	& \Theta & \\
+	\\
+	{\mathbb{P}_p[\mathcal{D}_{exp}]} && {\mathbb{P}_p[\mathcal{D}_{qry}]}
+	\arrow["{\mathcal{R}_{exp}^{(p)}}"', from=1-2, to=3-1]
+	\arrow["{\mathcal{R}_{qry}^{(p)}}", from=1-2, to=3-3]
+\end{tikzcd}
+  \caption{System of two probabilistic causal programs}
+  \label{fig:two}
+\end{figure}
+
+Figure \ref{fig:two} illustrates a system by which choice of $\MU$ induces distributions on the results each of these respective causal programs. Notably, these distributions may exhibit any degree of covariance. In general, increasing covariance represents increasing ability to infer one program from the other, and decreasing covariance represent increasing ability to efficiently represent the results of one program in terms of the other.
+
+Many interesting properties are representable even in this simplistic domain. For example, if the resultant $\P_p$ distributions are related via a determinstic transform, we say that the query is ``identifiable'' from the experimental data.
+
+\subsection{``Soft'' Posterior Estimators}
+
+We now make a slight alteration to the modelling domain to introduce the idea of ``soft'' estimates of the query program. In the modelling domain represented by figure \ref{fig:two}, distributions on $\D_{qry}$ are not available unless a value of $\MU$ is fixed. Alternatively, in the ``fully Bayesian'' case, if a prior on $\MU$ itself can be fixed, then (joint) distributions of $\D_{exp}$ and $\D_{qry}$ are also fixed. Unfortunately, priors on $\MU$ are not available or semantically meaningful in the general case.
+
+However, if a result $\D_{exp}$ is fixed, then a \textit{posterior} distribution on $\MU$, in which the liklihoods of various $\MU$ are proportional to the relatively liklihood of our fixed $\D_{exp}$ under them, is also fixed. Thus, any observation of the result of $\R_{exp}$ fixes a posterior distribution on $\D_{qry}$ even without a prior on $\MU$:
+
+
+
+\begin{figure}[h]
+  \centering\Large
+  % https://q.uiver.app/#q=WzAsMyxbMSwwLCJcXFRoZXRhIl0sWzAsMiwiXFxtYXRoY2Fse0R9X3tleHB9Il0sWzIsMiwiXFxtYXRoYmJ7UH1fcFtcXG1hdGhjYWx7RH1fe3FyeX1dIl0sWzAsMSwiXFxtYXRoY2Fse1Jfe2V4cH19XnsocCl9IiwyLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoic3F1aWdnbHkifX19XSxbMCwyLCJcXG1hdGhjYWx7Ul97cXJ5fX1eeyhwKX0iXSxbMSwyLCJcXGFscGhhXnsocCl9IiwxLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV1d
+\begin{tikzcd}
+	& \Theta & \\
+	\\
+	{\mathcal{D}_{exp}} && {\mathbb{P}_p[\mathcal{D}_{qry}]}
+	\arrow["{\mathcal{R}_{exp}^{(p)}}"', squiggly, from=1-2, to=3-1]
+	\arrow["{\mathcal{R}_{qry}^{(p)}}", from=1-2, to=3-3]
+	\arrow["{\alpha^{(p)}}"{description}, dashed, from=3-1, to=3-3]
+\end{tikzcd}
+  \caption{Posterior-liklihood characterization of two programs}
+  \label{fig:lik}
+\end{figure}
+
+Figure \ref{fig:lik} depicts this relationship: fixing $\R_{exp}$ and $\R_{qry}$ induces a distribution on $\D_{qry}$ for any fixed observation of $\D_{exp}$. This induced mapping $\alpha$ is called a ``soft'' decision because it does not force choice of a particular value of $\D_{qry}$, but simply weights the relative liklihoods of each potential value of $\D_{qry}$ given the observation of $\D_{exp}$.
+
+The diagram, and in particular the mapping under $\R_{exp}$ is mutilated accordingly to show that $\R_{exp}$, in this setting, is evaluated in its ``backwards'' direction rather than ``forwards''.
+
+This posterior-characterized modelling domain already presents specialized opportunities for analysis and inference. In particular, any properties or characterizations of $\a^{(p)}$ are semantically meaningful properties or characterizations of the ability of the experimental procedure to answer the query. For example, the variance (or entropy) of $\alpha(d)$ averaged across, maximized across, or otherwise weighted across potential outcomes $d$ of $\R_{exp}$ represents the degree of certainty with which $\R_{qry}$ can be inferred from $\R_{exp}$.
+
+For small examples, reduction of the modelling domain to the construction or characterization of this induced $\alpha$ posterior may be sufficient. However, it is still very a high-dimensional mathematical object in the general case, and often further concretization is useful as described next.
+
+\subsection{``Hard'' Estimators and Classification}
+
+\begin{figure}[h]
+  \centering\Large
+% https://q.uiver.app/#q=WzAsNCxbMSwwLCJcXFRoZXRhIl0sWzAsMiwiXFxtYXRoY2Fse0R9X3tleHB9Il0sWzIsMiwiXFxtYXRoYmJ7UH1fcFtcXG1hdGhjYWx7RH1fe3FyeX1dIl0sWzQsMiwiXFxtYXRoY2Fse0F9Il0sWzAsMSwiXFxtYXRoY2Fse1J9X3tleHB9XnsocCl9IiwyLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoic3F1aWdnbHkifX19XSxbMCwyLCJcXG1hdGhjYWx7Un1fe3FyeX1eeyhwKX0iXSxbMSwyLCJcXGFscGhhXnsocCl9IiwxLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV0sWzIsMywiXFxiZXRhIl0sWzEsMywiXFxnYW1tYSIsMix7ImN1cnZlIjo1LCJzdHlsZSI6eyJib2R5Ijp7Im5hbWUiOiJkYXNoZWQifX19XV0=
+\begin{tikzcd}
+	& \Theta &&& \\
+	\\
+	{\mathcal{D}_{exp}} && {\mathbb{P}_p[\mathcal{D}_{qry}]} && {\mathcal{A}}
+	\arrow["{\mathcal{R}_{exp}^{(p)}}"', squiggly, from=1-2, to=3-1]
+	\arrow["{\mathcal{R}_{qry}^{(p)}}", from=1-2, to=3-3]
+	\arrow["{\alpha^{(p)}}"{description}, dashed, from=3-1, to=3-3]
+	\arrow["\gamma"', curve={height=30pt}, dashed, from=3-1, to=3-5]
+	\arrow["\beta", from=3-3, to=3-5]
+\end{tikzcd}
+  \caption{Complete pipeline}
+  \label{fig:comp}
+\end{figure}
+
+\section{Certification Goals}
+
+
+
+\end{document}

@@ -215,7 +215,19 @@ let lookup k m =
                 V V
                 X_2
 
+                "effect size"
+
                 is P_U[X_2 | X_1] - P_U[X_2 | NOT X_1] > threshold
+
+                is P_U[X_2 | do(X_1)] - P_U[X_2 | do(not X_1] > threshold
+
+                I[not X_1] M_2 I[X_1] M_2 \in {[0, 1], [0 0], [1 0], [1 1]}
+
+                1)
+                I[X_1 = true; M[X_2]
+                I[X_1 = false; M[X_2]
+                
+             
 
                 X_2 = f_2(X_0, X_1, U_2) 
 
@@ -232,33 +244,19 @@ let reccomend_one_for_two_signal m : bool =
     (lookup [true] one_neg_results) /. (1. -. lookup [] one_neg_results) in
   prob_two_given_one > prob_two_given_none +. threshold
 
+let reccomend_one_for_two_signal_intervene m : bool =
+  let one_pos_results = domain_results [m] [Intervene (true, 1); Measure 2] in
+  let one_neg_results = domain_results [m] [Intervene (false, 1); Measure 2] in
+  let prob_two_given_one =
+    (lookup [true] one_pos_results) /. (1. -. lookup [] one_pos_results) in
+  let prob_two_given_none =
+    (lookup [true] one_neg_results) /. (1. -. lookup [] one_neg_results) in
+  prob_two_given_one > prob_two_given_none +. threshold
+
 let () = [
-    ("maximaler", [Measure 0; Measure 1; Measure 2;
-                 Intervene (true, 0); Intervene (true, 1); Measure 2;
-                 Intervene (false, 0); Intervene (true, 1); Measure 2;
-                 Intervene (true, 0); Intervene (false, 1); Measure 2;
-                 Intervene (false, 0); Intervene (false, 1); Measure 2]
-    );
-
-    ("maximal", [Measure 0; Measure 1; Measure 2;
-                 Intervene (true, 0); Intervene (true, 1); Measure 2;
-                 Intervene (false, 0); Intervene (true, 1); Measure 2]);
-    
-    ("observe 12", [Measure 1; Measure 2]);
-    
-    ("intervene 0", [Intervene (true, 0); Measure 2]);
-    
-    ("intervene 1", [Intervene (true, 1); Measure 2]);
-    
-    ("intervene 01", [Intervene (true, 1); Intervene (true, 0); Measure 2]);
-
-    ("intervene 0 twice", [Intervene (true, 0); Measure 2; Intervene (false, 0); Measure 2]);
-    
-    ("intervene 1 twice", [Intervene (true, 1); Measure 2; Intervene (false, 1); Measure 2]);
-    
-    ("intervene 01 twice", [Intervene (true, 1); Intervene (true, 0); Measure 2;
-                            Intervene (false, 1); Intervene (false, 0); Measure 2])
-
+    ("RCT", [Intervene (true, 1); Measure 2; Intervene(false, 1); Measure 2]);
+    ("CONTROL RCT", [Assign (true, 0); Intervene (true, 1); Measure 2; Intervene(false, 1); Measure 2]);
+    ("POST-CONTROL RCT", [Intervene (true, 1); Assign (true, 0);  Measure 2; Intervene(false, 1); Assign (true, 0); Measure 2]);
     
   ] |> List.map (fun (title, prog) -> (title, pf_pd reccomend_one_for_two_signal prog))
          |> plot_scatter
@@ -266,3 +264,6 @@ let () = [
 (* to run:
    dune exec ./operationalize.exe
  *)
+
+
+let _ = reccomend_one_for_two_signal_intervene
