@@ -224,7 +224,7 @@ The above information processing pipeline can be interpreted operationally as fo
 \begin{enumerate}
 \item Fix experimental and query programs $\R_{exp}$ and $\R_{qry}$, and a prior $p$ on $\U$ (see figure \ref{fig:two})
 \item Compute $\alpha^{(p)}$ - the ideal ``soft'' decision posterior estimate of $\D_{qry}$ (the theoretical result of $\R^{(p)}_{qry}$) given $\D_{exp}$ (the real result of $\R^{(p)}_{exp}$) (see figure \ref{fig:lik})
-\item Fix a ``hard'' decision $\A$ defined by a mapping $\beta: \mathbb{P}_p[\D_{qry}] \to \A$ - i.e. pick a concrete (non-probabilistic) property of distributions over $\D_{qry}$.
+\item Fix a ``hard'' decision $\mathcal{A}$ defined by a mapping $\beta: \mathbb{P}_p[\D_{qry}] \to \mathcal{A}$ - i.e. pick a concrete (non-probabilistic) property of distributions over $\D_{qry}$.
 \item Compute $\gamma$ - the ideal ``hard'' decision corresponding to the composition of computed $\alpha$ and chosen $\beta$ (see fig \ref{fig:comp}).
 \item (optional): Compute $\bar{\gamma}$ - an approximation of $\gamma$ up to error $\mathcal{E}$ that may be more interpretable or more computationally feasible to evaluate, infer, or represent.
 \end{enumerate}
@@ -234,7 +234,7 @@ Each step of this operationalization lends itself to formal verification:
 \begin{description}
 \item[[1 $\to$ 2]] Computing $\alpha^{(p)}$ directly (i.e. intensionally via raw distributions) is computationally feasible only for tiny domains. Formal semantics of \AIM programs suffice to form and validate (extensional) algebraic representations of $\alpha$, or verify the sound approximacy of other intensional representations.
 \item[[2 $\to$ 3]] Various principles in theoretical statistic justify choices of $\beta$ - for example, maximum liklihood, minimax loss, minimum variance unbiased estimators, information theoretic encoding schemes. Formal verification can show the correspondence between these principled estimators and domain-specific choices.
-\item[[3 $\to$ 4, 5]] Similarly to the $[1 \to 2]$ case, exact specification of $\gamma$ is algebraically complex, and computationally infeasible. Verifiction of algebraic rewrites or computational approximation is highly valuable.
+\item[[3 $\to$ 4, 5]] Similarly to the $[1 \to 2]$ case, exact specification of $\gamma$ is algebraically complex, and computationally infeasible. Verifiction of algebraic rewrites or computational approximation is highly valuable. In subdomains, \textit{synthesis} of $\gamma$ or $\bar{\gamma}$ up to certain bounded cost constraints may also be enabled.
 \end{description}
 
 Together, some or all of these certification goals would provide a meaingful improvement to the state of the art in verified implementation of causal inference.
