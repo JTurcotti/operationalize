@@ -100,11 +100,11 @@ Now assume that we have a semantics for causal programs $\R$ that deterministica
 
 $$\boxed{\MU, \U \vdash \R \dto \U}$$
 
-Consider a partially Bayesian approach in which a natural prior $p$ for $\U$ exists\footnote{see: max entropy priors}. We can now consider $\R^{(p)}$ to be a probabilistic program that produces a \textit{distribution} over outputs $\D$ for any fixed $\MU$:
+Consider a partially Bayesian approach in which a natural prior $p$ for $\U$ exists\footnote{see: max entropy priors}. We can now consider $\R^{\{p}\}$ to be a probabilistic program that produces a \textit{distribution} over outputs $\D$ for any fixed $\MU$:
 
-$$\boxed{\MU \vdash \R^{(p)} \dto \P_p[\D]}$$
+$$\boxed{\MU \vdash \R^{\{p\}} \dto \P_p[\D]}$$
 
-This can be directly read as ``program $\R^{(p)}$ produces results distributed according to $\P_p[\D]$ in the context of $\MU$ when $\U$ is distributed according to $p$''.
+This can be directly read as ``program $\R^{\{p\}}$ produces results distributed according to $\P_p[\D]$ in the context of $\MU$ when $\U$ is distributed according to $p$''.
 
 The details of efficiently translating representations of $p$ and $\R$ into representations of $\P_p[\D]$ are subtle in the general case, but for small dimension, it is a simple ``counting'' problem: the probability associated with result $\D$ is the sum of all probabilities associated with $\U$ that map under $\MU$ and $\R$ to $\D$.\footnote{in the general case, continuous and/or convex analysis or other approximation like MCMC may suffice}
 
@@ -126,8 +126,8 @@ In general $\R_{qry}$ should be small and simple, so that predictions of its out
 	& \Theta & \\
 	\\
 	{\mathbb{P}_p[\mathcal{D}_{exp}]} && {\mathbb{P}_p[\mathcal{D}_{qry}]}
-	\arrow["{\mathcal{R}_{exp}^{(p)}}"', from=1-2, to=3-1]
-	\arrow["{\mathcal{R}_{qry}^{(p)}}", from=1-2, to=3-3]
+	\arrow["{\mathcal{R}_{exp}^{\{p\}}}"', from=1-2, to=3-1]
+	\arrow["{\mathcal{R}_{qry}^{\{p\}}}", from=1-2, to=3-3]
 \end{tikzcd}
   \caption{System of two probabilistic causal programs}
   \label{fig:two}
@@ -152,9 +152,9 @@ However, if a result $\D_{exp}$ is fixed, then a \textit{posterior} distribution
 	& \Theta & \\
 	\\
 	{\mathcal{D}_{exp}} && {\mathbb{P}_p[\mathcal{D}_{qry}]}
-	\arrow["{\mathcal{R}_{exp}^{(p)}}"', squiggly, from=1-2, to=3-1]
-	\arrow["{\mathcal{R}_{qry}^{(p)}}", from=1-2, to=3-3]
-	\arrow["{\alpha^{(p)}}"{description}, dashed, from=3-1, to=3-3]
+	\arrow["{\mathcal{R}_{exp}^{\{p\}}}"', squiggly, from=1-2, to=3-1]
+	\arrow["{\mathcal{R}_{qry}^{\{p\}}}", from=1-2, to=3-3]
+	\arrow["{\alpha^{\{p\}}}"{description}, dashed, from=3-1, to=3-3]
 \end{tikzcd}
   \caption{Posterior-liklihood characterization of two programs}
   \label{fig:lik}
@@ -164,7 +164,7 @@ Figure \ref{fig:lik} depicts this relationship: fixing $\R_{exp}$ and $\R_{qry}$
 
 The diagram, and in particular the mapping under $\R_{exp}$ is mutilated accordingly to show that $\R_{exp}$, in this setting, is evaluated in its ``backwards'' direction rather than ``forwards''.
 
-This posterior-characterized modelling domain already presents specialized opportunities for analysis and inference. In particular, any properties or characterizations of $\alpha^{(p)}$ are semantically meaningful properties or characterizations of the ability of the experimental procedure to answer the query. For example, the variance (or entropy) of $\alpha(d)$ averaged across, maximized across, or otherwise weighted across potential outcomes $d$ of $\R_{exp}$ represents the degree of certainty with which $\R_{qry}$ can be inferred from $\R_{exp}$.
+This posterior-characterized modelling domain already presents specialized opportunities for analysis and inference. In particular, any properties or characterizations of $\alpha^{\{p\}}$ are semantically meaningful properties or characterizations of the ability of the experimental procedure to answer the query. For example, the variance (or entropy) of $\alpha(d)$ averaged across, maximized across, or otherwise weighted across potential outcomes $d$ of $\R_{exp}$ represents the degree of certainty with which $\R_{qry}$ can be inferred from $\R_{exp}$.
 
 For small examples, reduction of the modelling domain to the construction or characterization of this induced $\alpha$ posterior may be sufficient. However, it is still very a high-dimensional mathematical object in the general case, and often further concretization is useful as described next.
 
@@ -181,9 +181,9 @@ This may be modelled as a function $\beta$ that maps the complex space of distri
 	& \Theta &&& \\
 	\\
 	{\mathcal{D}_{exp}} && {\mathbb{P}_p[\mathcal{D}_{qry}]} && {\mathcal{A}}
-	\arrow["{\mathcal{R}_{exp}^{(p)}}"', squiggly, from=1-2, to=3-1]
-	\arrow["{\mathcal{R}_{qry}^{(p)}}", from=1-2, to=3-3]
-	\arrow["{\alpha^{(p)}}"{description}, dashed, from=3-1, to=3-3]
+	\arrow["{\mathcal{R}_{exp}^{\{p\}}}"', squiggly, from=1-2, to=3-1]
+	\arrow["{\mathcal{R}_{qry}^{\{p\}}}", from=1-2, to=3-3]
+	\arrow["{\alpha^{\{p\}}}"{description}, dashed, from=3-1, to=3-3]
 	\arrow["\gamma"', curve={height=40pt}, dashed, from=3-1, to=3-5]
 	\arrow["\beta", from=3-3, to=3-5]
 \end{tikzcd}
@@ -209,9 +209,9 @@ Notably, the complete modelling domain specified in figure \ref{fig:comp} lends 
 	\\
 	{\mathcal{D}_{exp}} && {\mathbb{P}_p[\mathcal{D}_{qry}]} && {\mathcal{A}} \\
 	&&&& {\bar{\mathcal{A}}}
-	\arrow["{\mathcal{R}_{exp}^{(p)}}"', squiggly, from=1-2, to=3-1]
-	\arrow["{\mathcal{R}_{qry}^{(p)}}", from=1-2, to=3-3]
-	\arrow["{\alpha^{(p)}}"{description}, dashed, from=3-1, to=3-3]
+	\arrow["{\mathcal{R}_{exp}^{\{p\}}}"', squiggly, from=1-2, to=3-1]
+	\arrow["{\mathcal{R}_{qry}^{\{p\}}}", from=1-2, to=3-3]
+	\arrow["{\alpha^{\{p\}}}"{description}, dashed, from=3-1, to=3-3]
 	\arrow["{\bar{\gamma}}"', curve={height=30pt}, dashed, from=3-1, to=4-5]
 	\arrow["\beta", from=3-3, to=3-5]
 	\arrow["{\mathcal{E}}", dotted, tail reversed, from=3-5, to=4-5]
@@ -231,7 +231,7 @@ The above information processing pipeline can be interpreted operationally as fo
 
 \begin{enumerate}
 \item Fix experimental and query programs $\R_{exp}$ and $\R_{qry}$, and a prior $p$ on $\U$ (see figure \ref{fig:two})
-\item Compute $\alpha^{(p)}$ - the ideal ``soft'' decision posterior estimate of $\D_{qry}$ (the theoretical result of $\R^{(p)}_{qry}$) given $\D_{exp}$ (the real result of $\R^{(p)}_{exp}$) (see figure \ref{fig:lik})
+\item Compute $\alpha^{\{p\}}$ - the ideal ``soft'' decision posterior estimate of $\D_{qry}$ (the theoretical result of $\R^{\{p\}}_{qry}$) given $\D_{exp}$ (the real result of $\R^{\{p\}}_{exp}$) (see figure \ref{fig:lik})
 \item Fix a ``hard'' decision $\mathcal{A}$ defined by a mapping $\beta: \mathbb{P}_p[\D_{qry}] \to \mathcal{A}$ - i.e. pick a concrete (non-probabilistic) property of distributions over $\D_{qry}$.
 \item Compute $\gamma$ - the ideal ``hard'' decision corresponding to the composition of computed $\alpha$ and chosen $\beta$ (see fig \ref{fig:comp}).
 \item (optional): Compute $\bar{\gamma}$ - an approximation of $\gamma$ up to error $\mathcal{E}$ that may be more interpretable or more computationally feasible to evaluate, infer, or represent.
@@ -240,7 +240,7 @@ The above information processing pipeline can be interpreted operationally as fo
 Each step of this operationalization lends itself to formal verification:
 
 \begin{description}
-\item[$\boxed{1 \to 2}$] Computing $\alpha^{(p)}$ directly (i.e. intensionally via raw distributions) is computationally feasible only for tiny domains. Formal semantics of \AIM programs suffice to form and validate (extensional) algebraic representations of $\alpha$, or verify the sound approximacy of other intensional representations.
+\item[$\boxed{1 \to 2}$] Computing $\alpha^{\{p\}}$ directly (i.e. intensionally via raw distributions) is computationally feasible only for tiny domains. Formal semantics of \AIM programs suffice to form and validate (extensional) algebraic representations of $\alpha$, or verify the sound approximacy of other intensional representations.
 \item[$\boxed{2 \to 3}$] Various principles in theoretical statistic justify choices of $\beta$ - for example, maximum liklihood, minimax loss, minimum variance unbiased estimators, information theoretic encoding schemes. Formal verification can show the correspondence between these principled estimators and domain-specific choices.
 \item[$\boxed{3 \to 4, (5)}$] Similarly to the $[1 \to 2]$ case, exact specification of $\gamma$ is algebraically complex, and computationally infeasible. Verifiction of algebraic rewrites or computational approximation is highly valuable. In subdomains, \textit{synthesis} of $\gamma$ or $\bar{\gamma}$ up to certain bounded cost constraints may also be enabled.
 \end{description}
