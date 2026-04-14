@@ -26,7 +26,7 @@ General statistical inference is a powerful tool for modelling the randomness of
 
 This report outlines a framework for extending statistical modelling to reason about causal programs with efficient computation and formal specification.
 
-You may skip to sections \ref{sec:found} and \ref{sec:frame} to find this report's contribution more immediately described with less context.
+You may skip to sections \ref{sec:found} for a summary of the \AIM semantics used to formalize causal programs, \ref{sec:frame} for the algebraic overview the bridges the gap between syntax of causal programs and creation of ``procedures-to-claim'' proofs that certain procedures suffice to prove certain claims, \ref{sec:cert} for a concretization of how this algebra translates into proof obligations, or to \ref{sec:app} to ground all this high-level wizardry in practical examples.
 
 \subsection{Failures of General Inference}
 
@@ -170,7 +170,15 @@ For small examples, reduction of the modelling domain to the construction or cha
 
 \subsection{``Hard'' Estimators and Classification}
 
-Practically, characterizing posteriors on $\D_{qry}$ is often much more information than we need. For example, if the query program measures an observable value before and after an intervention, we may only care to know whether the difference in those two measurements is at least $\delta$ with probability at least $(1- \epsilon)$ for  some thresholds $\epsilon$ and $\delta$\footnote{for example $\epsilon = 0.05$ is a standard ``p value'' threshold}.
+Practically, characterizing posteriors on $\D_{qry}$ is often much more information than we need.\\
+
+{\bf
+$\beta$ example:
+}\\
+
+{\it
+For example, if the query program measures an observable value before and after an intervention, we may only care to know whether the difference in those two measurements is at least $\delta$ with probability at least $(1- \epsilon)$ for  some thresholds $\epsilon$ and $\delta$\footnote{for example $\epsilon = 0.05$ is a standard ``p value'' threshold}.
+}\\
 
 This may be modelled as a function $\beta$ that maps the complex space of distributions over $\D_{qry}$ to a much smaller (even binary) domain $\mathcal{A}$ representing answers to a particular question about that distribution. We can now attempt, instead of fully characterizing $\alpha$, to just characterize some $\gamma$ that directly provides an answer $\mathcal{A}$ for any observed value of $\D_{exp}$, but still corresponds to a theoretical composition of $\alpha$ and $\beta$. This relationship is depicted in figure \ref{fig:comp}.
 
@@ -224,10 +232,12 @@ Here, the obligation to show $\gamma$ as an exact composition of $\alpha$ and $\
 
 Even more importantly, $\bar{\gamma}$ can be constrained to be a clearly \textit{interpretable} family of models, such as deciison trees. This modelling scenario would thus suffice to show the conditions under which nuanced causal queries may be answered by a composition of a human-comprehensible data-generating process and a human-comphrenensible decision procedure on that data - like a ``flowchart'' style classification.
 
-\section{Certification Goals/Applications}
+\section{Certification Goals}
 \label{sec:cert}
 
-The above information processing pipeline can be interpreted operationally as follows:
+The above information processing pipeline is meant to show how ``procedure-to-claim'' proofs decompose into a series of independently-verifiable algebraic transforms. This section does \textit{not} attempt to show how real world choices of $\R_{qry}$, $\R_{exp}$, and $\beta$ translate into particular claims inhabited by this proofs; for that, see section \ref{sec:app}.
+
+Given that the user either accepts \textit{claim specifications} $(\R_{qry}, \R_{exp}, \beta)$ as given, or has internalized rationale for choosing them herself, the algebraic construction of the estimator $\gamma$ whose semantics define the ultimate claim proceeds as follows:
 
 \begin{enumerate}
 \item Fix experimental and query programs $\R_{exp}$ and $\R_{qry}$, and a prior $p$ on $\U$ (see figure \ref{fig:two})
@@ -247,6 +257,16 @@ Each step of this operationalization lends itself to formal verification:
 
 Together, some or all of these certification goals would provide a meaingful improvement to the state of the art in verified implementation of causal inference.
 
+Since any $\gamma$ compatible with the framework in section \ref{sec:frame} can be thus constructed, any such $\gamma$ can also be thus verified. In this sense, the framework justifies itself as not just a construction of statistical estimators, but a \textit{correctness by construction} doctrine for synthesis of statistical estimators.
+
+\section{Applying the Framework}
+\label{sec:app}
+
+
+The reader's first reaction to section \ref{sec:frame} may center on appreciating from a distance that there's pretty math at play without really understanding what the mean means. This section attempts to remedy that.
+
+
+
 \section{Conclusion}
 
 Section \ref{sec:mot} motivated the need to specialize the modelling tasks of general statistical/causal inference whenever possible, showing that when we focus on the particular situation of using one causal program to predict another in the context of a structural causal model, the vast majority of the complexity from the general case of overparametric inference can be eliminated.
@@ -255,7 +275,9 @@ Section \ref{sec:found} provided sufficient details of the modelling of causal p
 
 Section \ref{sec:frame} provieded a framework for extending high level mathematical characterizations of causal programs to specifications of concrete ``soft'' and ``hard'' estimators for causal queries at varying levels of abstraction.
 
-Finally, section \ref{sec:cert}  began to discus the application of this framework to certified decision making procedures.
+Section \ref{sec:cert}  began to discus the application of this framework to certified decision making procedures.
+
+Finally, section \ref{sec:app} walked through a few example applications of the framework.
 
 Together, this report begins to illustrate that the combination of general statistical inference, structural causal models, and concrete semantics for causal programs suffices to specify and certify efficient and explainable causal inferential procedures.
 
