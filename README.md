@@ -1,2 +1,10 @@
+see [report2/report.pdf](report0/report.pdf) for writeup
+of the high-level algebraic pipeline proposed to 
+facilitate procedure-to-claim certification of 
+causal inference.
+
 see [report0/report.pdf](report0/report.pdf) for writeup
-operationalize.ml for source
+of a motivating example of AIM semantics to provide
+formal semantics for defining operating characteristics
+of causal programs making binary decisions.
+[operationalize.ml](operationalize.ml) for source thereof.
