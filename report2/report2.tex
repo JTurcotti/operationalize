@@ -28,6 +28,8 @@ This report outlines a framework for extending statistical modelling to reason a
 
 You may skip to sections \ref{sec:found} for a summary of the \AIM semantics used to formalize causal programs, \ref{sec:frame} for the algebraic overview the bridges the gap between syntax of causal programs and creation of ``procedures-to-claim'' proofs that certain procedures suffice to prove certain claims, \ref{sec:cert} for a concretization of how this algebra translates into proof obligations, or to \ref{sec:app} to ground all this high-level wizardry in practical examples.
 
+For the casual reader who wants to understand why this framework is valuable without understanding the framework iteslf, minimally skimming everything up until section \ref{sec:app} may be the most rewarding scheme.
+
 \subsection{Failures of General Inference}
 
 In the modern age, ridiculously high-dimensional ``overparameterized'' inference is broadly considered tractable with two important caveats: \textit{explainability} and \textit{representability}.
@@ -68,6 +70,11 @@ The estimator can be proven sound with respect to all assumptions and specificat
 \newcommand{\U}{\mathcal{U}}
 \newcommand{\MU}{\Theta}
 \newcommand{\dto}{\downarrow}
+
+\newcommand{\Rqry}{\ensuremath{\R_{qry}}~}
+\newcommand{\Rexp}{\ensuremath{\R_{exp}}~}
+\newcommand{\Dqry}{\ensuremath{\D_{qry}}~}
+\newcommand{\Dexp}{\ensuremath{\D_{exp}}~}
 
 
 
@@ -113,11 +120,11 @@ The details of efficiently translating representations of $p$ and $\R$ into repr
 Our key insight for specializing the model domain is to consider a \textit{pair} of causal programs:
 
 \begin{description}
-\item[$\R_{exp}$]: ``experimental program'' - describes the causal program used to gather data about the world; must correspond to a practical procedure that can be performed to build a dataset of outcomes given access to a large pool of individuals or other units to evaluate
-\item[$\R_{qry}$]: ``query program'' - describes the causal program used to define the question about about the world we seek to answer; need not be practically executable itself
+\item[$\Rexp$]: ``experimental program'' - describes the causal program used to gather data about the world; must correspond to a practical procedure that can be performed to build a dataset of outcomes given access to a large pool of individuals or other units to evaluate
+\item[$\Rqry$]: ``query program'' - describes the causal program used to define the question about about the world we seek to answer; need not be practically executable itself
 \end{description}
 
-In general $\R_{qry}$ should be small and simple, so that predictions of its outcome are ``human readable'', but this may come at the cost of being practically realizable, but $\R_{exp}$ may be arbitrarily complex as needed to ensure correspondence to a realistic experimental procedure.
+In general $\Rqry$ should be small and simple, so that predictions of its outcome are ``human readable'', but this may come at the cost of being practically realizable, but $\Rexp$ may be arbitrarily complex as needed to ensure correspondence to a realistic experimental procedure.
 
 \begin{figure}[h]
   \centering\Large
@@ -141,7 +148,7 @@ Many interesting properties are representable even in this simplistic domain. Fo
 
 We now make a slight alteration to the modelling domain to introduce the idea of ``soft'' estimates of the query program. In the modelling domain represented by figure \ref{fig:two}, distributions on $\D_{qry}$ are not available unless a value of $\MU$ is fixed. Alternatively, in the ``fully Bayesian'' case, if a prior on $\MU$ itself can be fixed, then (joint) distributions of $\D_{exp}$ and $\D_{qry}$ are also fixed. Unfortunately, priors on $\MU$ are not available or semantically meaningful in the general case.
 
-However, if a result $\D_{exp}$ is fixed, then a \textit{posterior} distribution on $\MU$, in which the liklihoods of various $\MU$ are proportional to the relatively liklihood of our fixed $\D_{exp}$ under them, is also fixed. Thus, any observation of the result of $\R_{exp}$ fixes a posterior distribution on $\D_{qry}$ even without a prior on $\MU$:
+However, if a result $\D_{exp}$ is fixed, then a \textit{posterior} distribution on $\MU$, in which the liklihoods of various $\MU$ are proportional to the relatively liklihood of our fixed $\D_{exp}$ under them, is also fixed. Thus, any observation of the result of $\Rexp$ fixes a posterior distribution on $\D_{qry}$ even without a prior on $\MU$:
 
 
 
@@ -160,11 +167,11 @@ However, if a result $\D_{exp}$ is fixed, then a \textit{posterior} distribution
   \label{fig:lik}
 \end{figure}
 
-Figure \ref{fig:lik} depicts this relationship: fixing $\R_{exp}$ and $\R_{qry}$ induces a distribution on $\D_{qry}$ for any fixed observation of $\D_{exp}$. This induced mapping $\alpha$ is called a ``soft'' decision because it does not force choice of a particular value of $\D_{qry}$, but simply weights the relative liklihoods of each potential value of $\D_{qry}$ given the observation of $\D_{exp}$.
+Figure \ref{fig:lik} depicts this relationship: fixing $\Rexp$ and $\Rqry$ induces a distribution on $\D_{qry}$ for any fixed observation of $\D_{exp}$. This induced mapping $\alpha$ is called a ``soft'' decision because it does not force choice of a particular value of $\D_{qry}$, but simply weights the relative liklihoods of each potential value of $\D_{qry}$ given the observation of $\D_{exp}$.
 
-The diagram, and in particular the mapping under $\R_{exp}$ is mutilated accordingly to show that $\R_{exp}$, in this setting, is evaluated in its ``backwards'' direction rather than ``forwards''.
+The diagram, and in particular the mapping under $\Rexp$ is mutilated accordingly to show that $\Rexp$, in this setting, is evaluated in its ``backwards'' direction rather than ``forwards''.
 
-This posterior-characterized modelling domain already presents specialized opportunities for analysis and inference. In particular, any properties or characterizations of $\alpha^{\{p\}}$ are semantically meaningful properties or characterizations of the ability of the experimental procedure to answer the query. For example, the variance (or entropy) of $\alpha(d)$ averaged across, maximized across, or otherwise weighted across potential outcomes $d$ of $\R_{exp}$ represents the degree of certainty with which $\R_{qry}$ can be inferred from $\R_{exp}$.
+This posterior-characterized modelling domain already presents specialized opportunities for analysis and inference. In particular, any properties or characterizations of $\alpha^{\{p\}}$ are semantically meaningful properties or characterizations of the ability of the experimental procedure to answer the query. For example, the variance (or entropy) of $\alpha(d)$ averaged across, maximized across, or otherwise weighted across potential outcomes $d$ of $\Rexp$ represents the degree of certainty with which $\Rqry$ can be inferred from $\Rexp$.
 
 For small examples, reduction of the modelling domain to the construction or characterization of this induced $\alpha$ posterior may be sufficient. However, it is still very a high-dimensional mathematical object in the general case, and often further concretization is useful as described next.
 
@@ -235,12 +242,12 @@ Even more importantly, $\bar{\gamma}$ can be constrained to be a clearly \textit
 \section{Certification Goals}
 \label{sec:cert}
 
-The above information processing pipeline is meant to show how ``procedure-to-claim'' proofs decompose into a series of independently-verifiable algebraic transforms. This section does \textit{not} attempt to show how real world choices of $\R_{qry}$, $\R_{exp}$, and $\beta$ translate into particular claims inhabited by this proofs; for that, see section \ref{sec:app}.
+The above information processing pipeline is meant to show how ``procedure-to-claim'' proofs decompose into a series of independently-verifiable algebraic transforms. This section does \textit{not} attempt to show how real world choices of $\Rqry$, $\Rexp$, and $\beta$ translate into particular claims inhabited by this proofs; for that, see section \ref{sec:app}.
 
-Given that the user either accepts \textit{claim specifications} $(\R_{qry}, \R_{exp}, \beta)$ as given, or has internalized rationale for choosing them herself, the algebraic construction of the estimator $\gamma$ whose semantics define the ultimate claim proceeds as follows:
+Given that the user either accepts \textit{claim signatures} $(\Rexp, \Rqry, \beta)$ as given, or has internalized rationale for choosing them herself, the algebraic construction of the estimator $\gamma$ whose semantics define the ultimate claim proceeds as follows:
 
 \begin{enumerate}
-\item Fix experimental and query programs $\R_{exp}$ and $\R_{qry}$, and a prior $p$ on $\U$ (see figure \ref{fig:two})
+\item Fix experimental and query programs $\Rexp$ and $\Rqry$, and a prior $p$ on $\U$ (see figure \ref{fig:two})
 \item Compute $\alpha^{\{p\}}$ - the ideal ``soft'' decision posterior estimate of $\D_{qry}$ (the theoretical result of $\R^{\{p\}}_{qry}$) given $\D_{exp}$ (the real result of $\R^{\{p\}}_{exp}$) (see figure \ref{fig:lik})
 \item Fix a ``hard'' decision $\mathcal{A}$ defined by a mapping $\beta: \mathbb{P}_p[\D_{qry}] \to \mathcal{A}$ - i.e. pick a concrete (non-probabilistic) property of distributions over $\D_{qry}$.
 \item Compute $\gamma$ - the ideal ``hard'' decision corresponding to the composition of computed $\alpha$ and chosen $\beta$ (see fig \ref{fig:comp}).
@@ -263,7 +270,71 @@ Since any $\gamma$ compatible with the framework in section \ref{sec:frame} can 
 \label{sec:app}
 
 
+
 The reader's first reaction to section \ref{sec:frame} may center on appreciating from a distance that there's pretty math at play without really understanding what the mean means. This section attempts to remedy that.
+
+\subsection{Interpreting Claim Signatures $(\Rexp, \Rqry, \beta)$}
+
+Section \ref{sec:frame} provided the algebraic machinary (fig \ref{fig:comp}) to claim a correspondence between $\Rexp, \Rqry, \beta$, and $\gamma$. We now investigate the consequences and interpretation of this correspondence more directly:
+
+$$\boxed{(\Rexp, \Rqry, \beta) \vdash \gamma}$$
+
+In section \ref{sec:cert}, we briefly called $(\Rexp, \Rqry, \beta)$ tuples ``claim signatures''. Broadly this is because the framework in section \ref{sec:frame} establishes that, given this tuple, there is a natural ``ideal estimator'' $\gamma$ that captures the ``best case scenario'' for attempting to answer a question $\beta$ about the data generated by a theoretical query program $\Rqry$, given only access to the data generated by a practical experimental program $\Rexp$. The interpretations of each element of this tuple are briefly rehashed as follows:
+
+\begin{description}
+\item[\boxed{\Rexp}]: A causal program that can produce data drawn from a domain $\Dexp$ given fixed $\MU$ and $U$. Notably, neither $\MU$ nor $\U$ can be \textit{directly} observed through observations of $\Dexp$; the dependencies are subtle, and teasing out programs that identify particular desired properties of $\MU$ and $\U$ is the game. Also of note: to obtain statistical power, the procedure should be run many times. Algebraically, each of these runs observes the same ``meta-universal parameter'' $\MU$, as they all investigate the same underlying causal mechanisms in the world, but observes a fresh ``universal parameter'' $\U$ drawn from the assumed (likely least informative) prior $p$. If it weren't for the former consistency, the data generated by each run would not meaningfully build on each other as they would be learning about fundamentally different universes. If it weren't for the latter variation, the data would perfectly predict each other an thus offer no marginal explanatory power.
+
+  Practically, the power of the framework lies in the stability of the proofs and analysis to changes in $\Rexp$ - making ``simulative'' exploration of the design space of possible experiments, and even search/synthesis in this space, natural and efficient.
+\item[\boxed{\Rqry}]: Usually, science is communicated both to the public and to other scientists not in the form of raw data but as claims about the world interrogated by that data. One of the key observations of this framework is that the language of claims about the world proved by experiments coincides with the language of experiments used to prove claims.
+
+  For example, the classic ``backdoor criterion'' observes that commonly, the ability to causally intervene on an observable quantity is constrained; one may wish to prove results about a population in which a condition naturally occurs, but may only experiment by artifically inducing the condition; or one may wish to prove results about artificially inducing a condition, but must do so with experiments that only have access to a population in whcih the condition naturally occurs. In both cases, the \textit{experimental program} \Rexp fundamentally differs from the \textit{query program} \Rqry. In the \AIM language, these two programs are $\A\M$ and $\I\M$ programs, respectively, for the former situation above, and $\I\M$ and $\A\M$ programs, respectively, for the latter situation above.
+
+  In the ``backdoor'' case, we ask for sufficient criteria on the causal structure for $\A\M$-$\I\M$ equivalence; i.e. we ask for conditions under which $\Rqry$ and $\Rexp$ may be freely exchanged. This is a simplest possible case, as now $\alpha$ is an identity, $\alpha^{\{p\}}$ is point-mass (dirac delta) embedding, the most trivial Kliesli arrow, and $\gamma \equiv \beta$ for any question $\beta$.
+
+  However, the power of this framework lies in relaxation. In general, $\A\M-\I\M$ equivalence (the ``backdoor criterion'') does not hold, and so the algebraic specification of nontrivial $\alpha$, and thus $\gamma \not\equiv \beta$ is the only mechanism to retain the ability to prove properties of \Rqry given only access to \Rexp.
+
+  In practice, \Rqry may be the first element of the claim signature fixed, as it corresponds to the natural phenomenon we are attempting to model; even if it is not directly observable, and an alternate phenomenon \Rexp must be devised to practically interrogate the world sufficiently to answer the desired question $\beta$ about $\Rqry$. 
+  
+\item[\boxed{\beta}]: Preliminary, exploratory analysis the data generated by an experimental procedure $\Rexp$ may involve processing and comprehension in its raw form; examining individual data points, reading tables, relabelling rows and columns, computing summary statistics by hand, generating and examining graphical representations of patterns in the data, drawing tentative conclusions based on perceived correlations, etc. However, when the methodology of the experiment is fixed and communicated, the dependence of analysis on the data must be made specific and concrete.
+
+  For example, correlation, expectation, variance, higher order moments, or other statitstics along chosen dimensions of the data may be chosen; and the analysis will proceed not to talk about individual data, but of these derived statistics. These reductions are essential not just for processing experimental data, but for describing the processing of $\Rqry$'s \textit{theoretical} data that we are attempting to model.
+
+  Even in the simplest cases, such as the $\A\M-\I\M$ ``backdoor'' equivalence. We may be attempting only to show that $\mathbb{E}[Y | do(X)] = \mathbb{E}[Y | X]$. In this case, $\gamma$ and $\beta$ are both the expectation operator $\mathbb{E}$ themselves. In other words, $\beta$ is a ``forgetful'' transform that isolates the specific properties of the behavior of $\Rqry$ that we wish to predict. Just as only specific, low-dimensional properties of $\Rexp$'s data will likely be relevant to proving our claim (a forgetfulness modelled by $\gamma$), only specific, low-dimensional properties of $\Rqry$'s data will be relevant to defining our claim; this is $\beta$'s forgetfulness.
+\end{description}
+
+Breifly, we now revisit our intepretation of ``claim signatures'':
+
+\begin{figure}[h]
+  \centering
+  $\boxed{(\Rexp, \Rqry, \beta) \vdash \gamma} \cong (\Rexp \circ \gamma \equiv \Rqry \circ \beta$)
+  \caption{definitional semantics of a claim signature}
+  \label{fig:clm}
+\end{figure}
+
+In other words, the relation $(\Rexp, \Rqry, \beta) \vdash \gamma$ (described earlier through the commutative diagram in figure \ref{fig:comp}) can also be described procedurally as claiming that ``to predict the value of a statistic $\beta$ over theoretical executions of $\Rqry$, it suffices to compute the value of statistic $\gamma$ over practical executions of an experimental procedure $\Rexp$.
+
+As noted above, if $\Rqry \equiv \Rexp$ (the ``identifiable'' case), then $\gamma \equiv \beta$ suffices. However, in general, the power of the framework lies in the specification of $\gamma$, given $\beta$, in cases when $\Rqry \not\equiv \Rexp$.
+
+Noting that many existing problems in experimental design that motivate this framework coincide with $\Rqry \equiv \Rexp$, we now investigate more broadly $(\Rqry, \beta)$ pairs in the absence of fixed $\Rexp$ - namely, we seek to demonstrate the expressivity of this framework for modelling claims without an a priori experimental procedure for establishing them in mind, tentatively referred to as ``subclaim'' signatures.
+
+
+\subsection{Subclaim Signatures $(\Rqry, \beta)$}
+
+For our running example, consider four observable values of the participants in a study investigating the effect of a treatment on sleep:
+
+\newcommand{\slp}{\textsc{slp}}
+\newcommand{\age}{\textsc{age}}
+\newcommand{\tmt}{\textsc{tmt}}
+\newcommand{\mvt}{\textsc{mvt}}
+
+\begin{description}
+\item[\slp]: nonnegative integer - average daily hours of participant's sleep over study period
+\item[\age]: nonngeative integer - age in years of participant
+\item[\tmt]: nonnegative integer - dose of treatment administered daily over study period
+\item[\mvt]: nonnegative integer - index (for example, minutes above resting HR) of daily movement of participant over study period
+\end{description}
+
+Notably, we will not present a specific causal structure over these observables; the framework of this report is entirely parametric in this structure, which will become manifest only in the algebraic details that establish or prove $\alpha$, which we take as given.
 
 
 
